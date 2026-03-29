@@ -5,6 +5,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Calendario 2026-2027 CELIDER-08</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -14,31 +17,29 @@
   <header class="topbar">
     <div class="container logo-header">
       <div class="logo-title">
-        <img src="logo.png" alt="Logo" class="logo">
-        <h1>Calendario 2026-2027 CELIDER-08</h1>
+        <img src="logo.png" alt="Logo CELIDER-08" class="logo">
+        <h1>Calendario 2026–2027 <span class="title-badge">CELIDER-08</span></h1>
       </div>
 
-      <!-- Hamburger button (JS-driven, no checkbox needed) -->
       <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú">
         <span></span><span></span><span></span>
       </button>
 
-      <!-- Desktop controls -->
       <div class="controls">
-        <button id="refreshBtn" class="btn">Actualizar</button>
+        <button id="refreshBtn" class="btn">↺ Actualizar</button>
+        <button id="adminBtn"   class="btn btn-admin" title="Panel Admin">🔒 Admin</button>
       </div>
     </div>
   </header>
 
   <!-- ================= MOBILE MENU ================= -->
   <div class="menu-overlay" id="menuOverlay"></div>
-
   <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú">
     <button class="mobile-menu-close" id="menuClose" aria-label="Cerrar menú">✕</button>
     <p class="mobile-menu-title">Menú</p>
     <div class="mobile-menu-items">
       <button id="refreshBtnMobile" class="btn">🔄 Actualizar</button>
-      <!-- Agrega más opciones aquí si las necesitas -->
+      <button id="adminBtnMobile"   class="btn">🔒 Panel Admin</button>
     </div>
   </div>
 
@@ -51,19 +52,20 @@
       <div id="upcoming"></div>
 
       <div class="legend">
-        <h3 class="legend-title">Leyenda de eventos</h3>
+        <h3 class="legend-title">Leyenda</h3>
         <div class="legend-items">
           <div class="legend-item"><span class="legend-dot tag-actividad"></span><span>Actividad</span></div>
           <div class="legend-item"><span class="legend-dot tag-visita"></span><span>Visita</span></div>
           <div class="legend-item"><span class="legend-dot tag-reunion"></span><span>Reunión</span></div>
           <div class="legend-item"><span class="legend-dot tag-evento"></span><span>Evento</span></div>
           <div class="legend-item"><span class="legend-dot tag-feriado"></span><span>Feriado</span></div>
+          <div class="legend-item"><span class="legend-dot tag-modelo"></span><span>Modelo Distrital</span></div>
         </div>
       </div>
     </aside>
   </main>
 
-  <!-- ================= MODAL ================= -->
+  <!-- ================= REGULAR EVENT MODAL ================= -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-card">
       <button id="modalClose" class="modal-close">✕</button>
@@ -71,301 +73,258 @@
       <p id="modalDate" class="muted"></p>
       <p id="modalDesc"></p>
       <img id="modalImg" class="modal-img" alt="">
-      <a id="modalPicsBtn" class="pics-access" target="_blank" rel="noopener"
-        onclick="window.open(this.href,'_blank'); return false;">
-        📷 Acceder a fotos
-      </a>
+      <a id="modalPicsBtn" class="pics-access" target="_blank" rel="noopener">📷 Acceder a fotos</a>
     </div>
   </div>
+
+  <!-- ================= MODELO DISTRITAL MODAL ================= -->
+  <div id="modeloModal" class="modal" aria-hidden="true">
+    <div class="modal-card modelo-modal-card">
+      <!-- Content injected dynamically by app.js -->
+    </div>
+  </div>
+
+  <!-- ================= ADMIN PANEL ================= -->
+  <div id="adminOverlay" class="admin-overlay" aria-hidden="true">
+    <div class="admin-panel">
+
+      <!-- Admin header -->
+      <div class="admin-header">
+        <div class="admin-header-left">
+          <span class="admin-logo">🔒</span>
+          <div>
+            <h2 class="admin-title">Panel Admin</h2>
+            <p class="admin-subtitle">CELIDER-08 · Calendario 2026–2027</p>
+          </div>
+        </div>
+        <button id="adminClose" class="admin-close-btn">✕</button>
+      </div>
+
+      <!-- Password gate -->
+      <div id="adminAuth" class="admin-auth">
+        <div class="admin-auth-inner">
+          <div class="admin-lock-icon">🔐</div>
+          <h3>Acceso restringido</h3>
+          <p>Ingresa la contraseña de administrador para continuar.</p>
+          <div class="admin-auth-form">
+            <input type="password" id="adminPassInput" class="admin-input" placeholder="Contraseña" autocomplete="current-password">
+            <button id="adminLoginBtn" class="btn btn-primary">Entrar</button>
+          </div>
+          <p id="adminAuthError" class="admin-auth-error"></p>
+        </div>
+      </div>
+
+      <!-- Main content (shown after auth) -->
+      <div id="adminContent" class="admin-content" style="display:none">
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+          <button class="admin-tab active"  data-tab="calendar">📅 Calendario</button>
+          <button class="admin-tab"         data-tab="modelos">🏛️ Modelos</button>
+          <button class="admin-tab"         data-tab="comisiones">📋 Comisiones</button>
+          <button class="admin-tab"         data-tab="asignaciones">🔗 Asignaciones</button>
+          <button class="admin-tab"         data-tab="mesas">👥 Mesas</button>
+        </div>
+
+        <!-- ══════════ Tab: Calendar ══════════ -->
+        <div id="tab-calendar" class="admin-tab-pane active">
+          <div class="tab-toolbar">
+            <h3 class="tab-title">Eventos del Calendario</h3>
+            <button class="btn btn-primary btn-sm" id="addCalendarBtn">+ Agregar evento</button>
+          </div>
+          <div id="calendarForm" class="admin-form" style="display:none">
+            <h4 class="form-title" id="calendarFormTitle">Nuevo Evento</h4>
+            <div class="form-grid">
+              <input type="hidden" id="cf-id">
+              <div class="form-field"><label>Fecha inicio *</label><input type="date" id="cf-date" class="admin-input"></div>
+              <div class="form-field"><label>Fecha fin</label><input type="date" id="cf-date_end" class="admin-input"></div>
+              <div class="form-field full"><label>Título *</label><input type="text" id="cf-title" class="admin-input" placeholder="Nombre del evento"></div>
+              <div class="form-field full"><label>Descripción</label><textarea id="cf-description" class="admin-input" rows="3" placeholder="Descripción opcional"></textarea></div>
+              <div class="form-field full"><label>URL Imagen</label><input type="url" id="cf-image" class="admin-input" placeholder="https://…"></div>
+              <div class="form-field full"><label>URL Fotos (álbum)</label><input type="url" id="cf-pictures" class="admin-input" placeholder="https://…"></div>
+              <div class="form-field">
+                <label>Tipo *</label>
+                <select id="cf-type" class="admin-input">
+                  <option value="actividad">Actividad</option>
+                  <option value="visita">Visita</option>
+                  <option value="reunion">Reunión</option>
+                  <option value="evento">Evento</option>
+                  <option value="feriado">Feriado</option>
+                  <option value="modelo">Modelo Distrital</option>
+                </select>
+              </div>
+              <div class="form-field" id="cf-modelo-ref-field" style="display:none">
+                <label>Metadata del modelo</label>
+                <select id="cf-modelo_ref" class="admin-input"><option value="">— Seleccionar (opcional) —</option></select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="saveCalendarBtn">Guardar</button>
+              <button class="btn" id="cancelCalendarBtn">Cancelar</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Fecha</th><th>Título</th><th>Tipo</th><th>Acciones</th></tr></thead>
+              <tbody id="calendarTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══════════ Tab: Modelos (metadata) ══════════ -->
+        <div id="tab-modelos" class="admin-tab-pane">
+          <div class="tab-toolbar">
+            <h3 class="tab-title">Metadata de Modelos</h3>
+            <button class="btn btn-primary btn-sm" id="addModeloBtn">+ Agregar</button>
+          </div>
+          <p class="tab-hint">Información adicional (imagen, edición) que puede vincularse a un evento del calendario vía "Modelo vinculado".</p>
+          <div id="modeloForm" class="admin-form" style="display:none">
+            <h4 class="form-title" id="modeloFormTitle">Nuevo Modelo</h4>
+            <div class="form-grid">
+              <input type="hidden" id="mf-id">
+              <div class="form-field full"><label>Nombre *</label><input type="text" id="mf-name" class="admin-input" placeholder="Ej: I Modelo Distrital CELIDER-08"></div>
+              <div class="form-field"><label>Edición</label><input type="text" id="mf-edition" class="admin-input" placeholder="Ej: I Edición"></div>
+              <div class="form-field"><label>Fecha inicio *</label><input type="date" id="mf-date" class="admin-input"></div>
+              <div class="form-field"><label>Fecha fin</label><input type="date" id="mf-date_end" class="admin-input"></div>
+              <div class="form-field full"><label>Descripción</label><textarea id="mf-description" class="admin-input" rows="3"></textarea></div>
+              <div class="form-field full"><label>URL Imagen de portada</label><input type="url" id="mf-image" class="admin-input" placeholder="https://…"></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="saveModeloBtn">Guardar</button>
+              <button class="btn" id="cancelModeloBtn">Cancelar</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Nombre</th><th>Edición</th><th>Fecha</th><th>Acciones</th></tr></thead>
+              <tbody id="modelosTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══════════ Tab: Comisiones (catálogo global) ══════════ -->
+        <div id="tab-comisiones" class="admin-tab-pane">
+          <div class="tab-toolbar">
+            <h3 class="tab-title">Catálogo de Comisiones</h3>
+            <button class="btn btn-primary btn-sm" id="addComisionGlobalBtn">+ Nueva comisión</button>
+          </div>
+          <p class="tab-hint">Define las comisiones disponibles globalmente. Una misma comisión puede reutilizarse en múltiples modelos.</p>
+          <div id="comisionGlobalForm" class="admin-form" style="display:none">
+            <h4 class="form-title" id="comisionGlobalFormTitle">Nueva Comisión</h4>
+            <div class="form-grid">
+              <input type="hidden" id="cgf-id">
+              <div class="form-field full"><label>Nombre de la comisión *</label><input type="text" id="cgf-nombre" class="admin-input" placeholder="Ej: Comisión de Medio Ambiente"></div>
+              <div class="form-field full"><label>Descripción</label><textarea id="cgf-descripcion" class="admin-input" rows="3" placeholder="Descripción del alcance de esta comisión…"></textarea></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="saveComisionGlobalBtn">Guardar</button>
+              <button class="btn" id="cancelComisionGlobalBtn">Cancelar</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Comisión</th><th>Descripción</th><th style="text-align:center">Usos</th><th>Acciones</th></tr></thead>
+              <tbody id="comisionesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══════════ Tab: Asignaciones ══════════ -->
+        <div id="tab-asignaciones" class="admin-tab-pane">
+          <div class="tab-toolbar">
+            <h3 class="tab-title">Asignaciones Evento ↔ Comisión</h3>
+            <button class="btn btn-primary btn-sm" id="addAsignacionBtn">+ Nueva asignación</button>
+          </div>
+          <p class="tab-hint">Asigna qué comisiones del catálogo participarán en cada Modelo Distrital, y define el tópico específico para ese evento.</p>
+          <div id="asignacionForm" class="admin-form" style="display:none">
+            <h4 class="form-title" id="asignacionFormTitle">Nueva Asignación</h4>
+            <div class="form-grid">
+              <input type="hidden" id="asf-id">
+              <div class="form-field full">
+                <label>Evento Modelo *</label>
+                <select id="asf-evento_id" class="admin-input"><option value="">— Seleccionar evento —</option></select>
+              </div>
+              <div class="form-field full">
+                <label>Comisión del catálogo *</label>
+                <select id="asf-comision_id" class="admin-input"><option value="">— Seleccionar comisión —</option></select>
+              </div>
+              <div class="form-field full"><label>Tópico para este evento</label><input type="text" id="asf-topico" class="admin-input" placeholder="Ej: Cambio climático y acción local"></div>
+              <div class="form-field full"><label>Descripción adicional</label><textarea id="asf-descripcion" class="admin-input" rows="2" placeholder="Contexto, alcance…"></textarea></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="saveAsignacionBtn">Guardar</button>
+              <button class="btn" id="cancelAsignacionBtn">Cancelar</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Evento</th><th>Comisión</th><th>Tópico</th><th style="text-align:center">Miembros</th><th>Acciones</th></tr></thead>
+              <tbody id="asignacionesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══════════ Tab: Mesas Directivas ══════════ -->
+        <div id="tab-mesas" class="admin-tab-pane">
+          <div class="tab-toolbar">
+            <h3 class="tab-title">Mesas Directivas</h3>
+            <button class="btn btn-primary btn-sm" id="addMesaDirectivaBtn">+ Agregar miembro</button>
+          </div>
+          <p class="tab-hint">Los miembros de mesa son específicos por evento y comisión. Dos eventos pueden tener la misma comisión con diferentes mesas.</p>
+          <div id="mesaDirectivaForm" class="admin-form" style="display:none">
+            <h4 class="form-title" id="mesaDirectivaFormTitle">Nuevo Miembro</h4>
+            <div class="form-grid">
+              <input type="hidden" id="mdf-id">
+              <div class="form-field full">
+                <label>Evento Modelo *</label>
+                <select id="mdf-evento_id" class="admin-input"><option value="">— Seleccionar evento —</option></select>
+              </div>
+              <div class="form-field full">
+                <label>Comisión *</label>
+                <select id="mdf-comision_id" class="admin-input"><option value="">— Seleccionar comisión —</option></select>
+              </div>
+              <div class="form-field">
+                <label>Cargo *</label>
+                <select id="mdf-role" class="admin-input">
+                  <option value="Presidente">Presidente/a</option>
+                  <option value="Vicepresidente">Vicepresidente/a</option>
+                  <option value="Moderador">Moderador/a</option>
+                  <option value="Secretario">Secretario/a</option>
+                  <option value="Relator">Relator/a</option>
+                  <option value="Asesor">Asesor/a</option>
+                  <option value="Delegado">Delegado/a</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div class="form-field"><label>Nombre completo *</label><input type="text" id="mdf-nombre" class="admin-input" placeholder="Nombre del miembro"></div>
+              <div class="form-field full"><label>Escuela / Centro educativo</label><input type="text" id="mdf-escuela" class="admin-input" placeholder="Nombre de la institución"></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="saveMesaDirectivaBtn">Guardar</button>
+              <button class="btn" id="cancelMesaDirectivaBtn">Cancelar</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Evento</th><th>Comisión</th><th>Cargo</th><th>Nombre</th><th>Escuela</th><th>Acciones</th></tr></thead>
+              <tbody id="mesasDirectivasTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /adminContent -->
+    </div><!-- /admin-panel -->
+  </div><!-- /adminOverlay -->
 
   <!-- ================= FOOTER ================= -->
   <footer class="footer">
     <div class="container">
-      <small>Celider 08© - Todos los derechos reservados</small>
+      <small>ODTeam© — Todos los derechos reservados · CELIDER-08</small>
     </div>
   </footer>
 
   <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Volver arriba"></button>
 
-  <!-- ================= SCRIPT ================= -->
-  <script>
-    /* ── Mobile menu ─────────────────────────────── */
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const menuOverlay  = document.getElementById("menuOverlay");
-    const mobileMenu   = document.getElementById("mobileMenu");
-    const menuClose    = document.getElementById("menuClose");
-
-    function openMenu() {
-      hamburgerBtn.classList.add("is-open");
-      menuOverlay.classList.add("is-open");
-      mobileMenu.classList.add("is-open");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeMenu() {
-      hamburgerBtn.classList.remove("is-open");
-      menuOverlay.classList.remove("is-open");
-      mobileMenu.classList.remove("is-open");
-      document.body.style.overflow = "";
-    }
-
-    hamburgerBtn.addEventListener("click", openMenu);
-    menuClose.addEventListener("click", closeMenu);
-    menuOverlay.addEventListener("click", closeMenu);
-
-    /* Actualizar desde el menú móvil */
-    document.getElementById("refreshBtnMobile").addEventListener("click", () => {
-      closeMenu();
-      setTimeout(() => location.reload(), 200);
-    });
-
-    /* ── Calendar data ───────────────────────────── */
-    const SHEET_ID   = "1M6KmCyI9nW21cD2cLER0POZceWOwQTA25n5sRXzjdYg";
-    const SHEET_NAME = "calendar";
-    const SHEET_URL  = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
-    const YEAR       = 2026;
-
-    const MONTHS     = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-    const DAYS_SHORT = ["D","L","M","M","J","V","S"];
-    const qs = s => document.querySelector(s);
-
-    const TODAY      = new Date();
-    const THIS_YEAR  = TODAY.getFullYear();
-    const THIS_MONTH = TODAY.getMonth();
-    const THIS_DAY   = TODAY.getDate();
-
-    let EVENTS = [];
-
-    const calendarArea = qs("#calendarArea");
-    const upcomingEl   = qs("#upcoming");
-    const refreshBtn   = qs("#refreshBtn");
-    const modal        = qs("#modal");
-    const modalTitle   = qs("#modalTitle");
-    const modalDate    = qs("#modalDate");
-    const modalDesc    = qs("#modalDesc");
-    const modalImg     = qs("#modalImg");
-    const modalPicsBtn = qs("#modalPicsBtn");
-    const modalClose   = qs("#modalClose");
-    const scrollTopBtn = qs("#scrollTopBtn");
-
-    /* ── Helpers ─────────────────────────────────── */
-    function parseDate(str) {
-      if (!str) return null;
-      const [y, m, d] = str.split("-").map(Number);
-      return new Date(y, m - 1, d);
-    }
-
-    function toKey(date) {
-      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
-    }
-
-    function dateRangeLabel(ev) {
-      const opts  = { day: "numeric", month: "short" };
-      const start = ev._dateStart.toLocaleDateString("es-ES", opts);
-      if (ev._days === 1) {
-        return ev._dateStart.toLocaleDateString("es-ES", { weekday:"short", day:"numeric", month:"short" });
-      }
-      return `${start} – ${ev._dateEnd.toLocaleDateString("es-ES", opts)}`;
-    }
-
-    /* ── Load ────────────────────────────────────── */
-    async function loadEvents() {
-      const res  = await fetch(SHEET_URL);
-      const data = await res.json();
-
-      EVENTS = data.map(r => {
-        const dateStart = parseDate(r.date?.trim());
-        if (!dateStart) return null;
-        const dateEnd = parseDate(r.date_end?.trim()) || new Date(dateStart);
-        const days    = Math.round((dateEnd - dateStart) / 86400000) + 1;
-        return {
-          date:        r.date?.trim(),
-          date_end:    r.date_end?.trim() || "",
-          title:       r.title?.trim(),
-          description: r.description?.trim(),
-          image:       r.image?.trim(),
-          pictures:    r.pictures?.trim(),
-          type:        (r.type || "evento").toLowerCase().trim(),
-          _dateStart:  dateStart,
-          _dateEnd:    dateEnd,
-          _days:       days
-        };
-      }).filter(Boolean).filter(e => e.title);
-
-      renderCalendar();
-      renderUpcoming();
-    }
-
-    /* ── Day map ─────────────────────────────────── */
-    function buildDayMap() {
-      const map = {};
-      EVENTS.forEach(ev => {
-        if (ev._days === 1) {
-          map[toKey(ev._dateStart)] = { ev, position: "single" };
-          return;
-        }
-        const cur = new Date(ev._dateStart);
-        while (cur <= ev._dateEnd) {
-          const key = toKey(cur);
-          let position;
-          if (cur.getTime() === ev._dateStart.getTime())    position = "start";
-          else if (cur.getTime() === ev._dateEnd.getTime()) position = "end";
-          else                                               position = "middle";
-          map[key] = { ev, position };
-          cur.setDate(cur.getDate() + 1);
-        }
-      });
-      return map;
-    }
-
-    /* ── Render calendar ─────────────────────────── */
-    function renderCalendar() {
-      calendarArea.innerHTML = "";
-      const dayMap = buildDayMap();
-      const isCurrentYear = YEAR === THIS_YEAR;
-      const monthSections = [];
-
-      for (let m = 0; m < 12; m++) {
-        const isPast    = isCurrentYear && m < THIS_MONTH;
-        const isCurrent = isCurrentYear && m === THIS_MONTH;
-
-        const section = document.createElement("section");
-        section.className = "month-card";
-        section.id = `month-${m + 1}`;
-        if (isPast)    section.classList.add("is-past");
-        if (isCurrent) section.classList.add("is-current");
-        section.innerHTML = `<h2 class="month-title">${MONTHS[m]}</h2>`;
-
-        const grid = document.createElement("div");
-        grid.className = "month-grid";
-
-        DAYS_SHORT.forEach(d => {
-          const h = document.createElement("div");
-          h.className = "day-header";
-          h.textContent = d;
-          grid.appendChild(h);
-        });
-
-        const firstDay    = new Date(YEAR, m, 1).getDay();
-        const daysInMonth = new Date(YEAR, m + 1, 0).getDate();
-
-        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement("div"));
-
-        for (let d = 1; d <= daysInMonth; d++) {
-          const key   = `${YEAR}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-          const entry = dayMap[key];
-          const cell  = document.createElement("button");
-          cell.className = "day-cell";
-
-          if (isCurrent && d === THIS_DAY) cell.classList.add("is-today");
-
-          if (entry) {
-            const { ev, position } = entry;
-            cell.classList.add("has-event", `tag-${ev.type}`, `range-${position}`);
-            cell.innerHTML = `<span>${d}</span>`;
-            if (position === "start" && ev._days > 1) {
-              cell.innerHTML += `<span class="range-badge">${ev._days}d</span>`;
-            }
-            cell.onclick = () => openModal(ev);
-          } else {
-            cell.innerHTML = `<span>${d}</span>`;
-          }
-
-          grid.appendChild(cell);
-        }
-
-        section.appendChild(grid);
-        monthSections.push({ section, isPast, isCurrent });
-      }
-
-      /* Current + future first */
-      monthSections.filter(ms => !ms.isPast).forEach(ms => calendarArea.appendChild(ms.section));
-
-      const past = monthSections.filter(ms => ms.isPast);
-      if (past.length > 0) {
-        const divider = document.createElement("div");
-        divider.className = "past-months-divider";
-        divider.textContent = "Meses anteriores";
-        calendarArea.appendChild(divider);
-        past.forEach(ms => calendarArea.appendChild(ms.section));
-      }
-
-      /* Scroll to current month */
-      if (isCurrentYear) {
-        requestAnimationFrame(() => {
-          const cur = qs(`#month-${THIS_MONTH + 1}`);
-          if (cur) {
-            const headerH = qs(".topbar")?.offsetHeight || 62;
-            window.scrollTo({ top: cur.getBoundingClientRect().top + window.scrollY - headerH - 14, behavior: "instant" });
-          }
-        });
-      }
-    }
-
-    /* ── Render upcoming ─────────────────────────── */
-    function renderUpcoming() {
-      upcomingEl.innerHTML = "";
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const upcoming = EVENTS
-        .filter(ev => ev._dateEnd >= today)
-        .sort((a, b) => a._dateStart - b._dateStart)
-        .slice(0, 6);
-
-      if (upcoming.length === 0) {
-        upcomingEl.innerHTML = `<p style="opacity:.45;font-size:.88rem;">No hay próximos eventos.</p>`;
-        return;
-      }
-
-      upcoming.forEach(ev => {
-        const card = document.createElement("div");
-        card.className = `upcoming-card tag-${ev.type}`;
-        const durationHtml = ev._days > 1 ? `<span class="duration-pill">${ev._days} días</span>` : "";
-        card.innerHTML = `
-          <strong class="event-name">${ev.title}</strong>
-          <div class="upcoming-meta">
-            <span class="event-date">${dateRangeLabel(ev)}</span>
-            ${durationHtml}
-          </div>
-        `;
-        card.onclick = () => openModal(ev);
-        upcomingEl.appendChild(card);
-      });
-    }
-
-    /* ── Modal ───────────────────────────────────── */
-    function openModal(ev) {
-      modalTitle.textContent = ev.title;
-      modalDate.textContent  = ev._days > 1
-        ? `${ev.date}  →  ${ev.date_end}  (${ev._days} días)`
-        : ev.date;
-      modalDesc.textContent  = ev.description;
-      modalImg.style.display = ev.image ? "block" : "none";
-      modalImg.src           = ev.image || "";
-      if (ev.pictures) {
-        modalPicsBtn.href          = ev.pictures;
-        modalPicsBtn.style.display = "flex";
-      } else {
-        modalPicsBtn.style.display = "none";
-      }
-      modal.classList.add("open");
-    }
-
-    modalClose.onclick = () => modal.classList.remove("open");
-    modal.onclick      = e => e.target === modal && modal.classList.remove("open");
-    refreshBtn.onclick = () => location.reload();
-
-    loadEvents();
-
-    window.addEventListener("scroll", () => {
-      scrollTopBtn.classList.toggle("show", window.scrollY > 300);
-    });
-
-    scrollTopBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  </script>
-
+  <script src="app.js"></script>
 </body>
 </html>
