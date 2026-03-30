@@ -3,7 +3,7 @@
 //  Requires Code.gs v2.0 deployed as Apps Script Web App
 // ================================================================
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYiu2FLLu5I9JBeoBi4zycjtJ75bkQi4AlQ5mimzT-6wWnJVjonZdB2_H6pYkrQqIQfQ/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGfYotCId_Ip4D1wXi2wVL-jNWmmlBwSjdnbs80FyLia62xmixbiMyEIBDV1wNuI26gg/exec";
 const YEAR       = 2026;
 const MONTHS     = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DAYS_SHORT = ["D","L","M","M","J","V","S"];
@@ -21,7 +21,14 @@ let COMISIONES       = [];   // global commission catalogue
 let MODELO_COMISIONES = [];  // junction: evento_id ↔ comision_id
 let MESAS_DIRECTIVAS = [];   // directiva members per event × commission
 
-// ── DOM refs ─────────────────────────────────────────────────────
+// ── Inline SVG icons (for JS-generated HTML) ─────────────────────
+const ICON = {
+  edit:  `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+  trash: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>`,
+  close: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+};
+
+
 const calendarArea = qs("#calendarArea");
 const upcomingEl   = qs("#upcoming");
 const refreshBtn   = qs("#refreshBtn");
@@ -130,7 +137,8 @@ async function loadAllData() {
   } catch (err) {
     calendarArea.innerHTML = `
       <div class="error-state">
-        ⚠️ Error al cargar datos. Verifica la URL del Apps Script.
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Error al cargar datos. Verifica la URL del Apps Script.
         <small>${err.message}</small>
       </div>`;
   }
@@ -341,7 +349,7 @@ function buildModeloModalContent(ev, meta, asignaciones, totalMiembros) {
   const comisionesHtml = buildComisionesHtml(ev, asignaciones);
 
   return `
-    <button class="modal-close">✕</button>
+    <button class="modal-close">${ICON.close}</button>
 
     <div class="modelo-hero">
       ${imageHtml}
@@ -407,7 +415,7 @@ function buildComisionesHtml(ev, asignaciones) {
           <div class="com-number">${String(idx + 1).padStart(2, "0")}</div>
           <div class="com-header-body">
             <span class="com-name">${com.nombre || "(Comisión sin nombre)"}</span>
-            ${a.topico ? `<span class="com-topic">${a.topico}</span>` : ""}
+            ${com.topico ? `<span class="com-topic">${com.topico}</span>` : ""}
           </div>
           <div class="com-header-right">
             <span class="com-member-count">${mesas.length} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
@@ -431,7 +439,7 @@ function buildMesaDirectivaHtml(mesas) {
     return `<p class="mesa-empty">Sin miembros registrados para esta comisión.</p>`;
   }
 
-  const roleOrder = ["Presidente","Vicepresidente","Moderador","Secretario","Relator","Asesor","Delegado","Otro"];
+  const roleOrder = ["Director/a","Director Adjunto/a","Evaluación y Control","Otro"];
   const sorted = [...mesas].sort((a, b) => {
     const ai = roleOrder.indexOf(a.role);
     const bi = roleOrder.indexOf(b.role);
@@ -451,10 +459,10 @@ function buildMesaDirectivaHtml(mesas) {
 
 function slugRole(role) {
   const map = {
-    "Presidente":"presidente", "Vicepresidente":"vicepresidente",
-    "Moderador":"moderador",   "Secretario":"secretario",
-    "Relator":"relator",       "Asesor":"asesor",
-    "Delegado":"delegado"
+    "Director/a":            "director",
+    "Director Adjunto/a":    "director-adjunto",
+    "Evaluación y Control":  "evaluacion-control",
+    "Otro":                  "otro"
   };
   return map[role] || "otro";
 }
@@ -579,6 +587,7 @@ function refreshAdminData() {
   renderAsignacionesTable();
   renderMesasDirectivasTable();
   populateAdminSelects();
+  if (window.lucide) lucide.createIcons();
 }
 
 // ── Populate all selects ──────────────────────────────────────────
@@ -631,8 +640,8 @@ function renderCalendarTable() {
       <td>${ev.title}</td>
       <td><span class="type-chip tag-${ev.type}">${ev.type}</span></td>
       <td class="action-btns">
-        <button class="btn btn-sm" onclick="editCalendarEvent('${ev.id}')">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCalendarEvent('${ev.id}')">🗑️</button>
+        <button class="btn btn-sm" onclick="editCalendarEvent('${ev.id}')">${ICON.edit}</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCalendarEvent('${ev.id}')">${ICON.trash}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -713,8 +722,8 @@ function renderModelosTable() {
       <td>${m.edition || "—"}</td>
       <td>${m.date}${m.date_end ? ` → ${m.date_end}` : ""}</td>
       <td class="action-btns">
-        <button class="btn btn-sm" onclick="editModelo('${m.id}')">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteModelo('${m.id}')">🗑️</button>
+        <button class="btn btn-sm" onclick="editModelo('${m.id}')">${ICON.edit}</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteModelo('${m.id}')">${ICON.trash}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -774,11 +783,12 @@ function renderComisionesGlobalesTable() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><strong>${c.nombre}</strong></td>
-      <td style="font-size:.82rem;color:var(--text-muted);max-width:280px">${c.descripcion || "—"}</td>
+      <td style="font-size:.82rem;color:var(--text-muted)">${c.topico || "—"}</td>
+      <td style="font-size:.82rem;color:var(--text-muted);max-width:220px">${c.descripcion || "—"}</td>
       <td style="text-align:center"><span class="usos-badge">${usos} uso${usos !== 1 ? "s" : ""}</span></td>
       <td class="action-btns">
-        <button class="btn btn-sm" onclick="editComisionGlobal('${c.id}')">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteComisionGlobal('${c.id}')">🗑️</button>
+        <button class="btn btn-sm" onclick="editComisionGlobal('${c.id}')">${ICON.edit}</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteComisionGlobal('${c.id}')">${ICON.trash}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -786,7 +796,7 @@ function renderComisionesGlobalesTable() {
 
 qs("#addComisionGlobalBtn").onclick = () => {
   qs("#comisionGlobalFormTitle").textContent = "Nueva Comisión";
-  clearForm(["cgf-id","cgf-nombre","cgf-descripcion"]);
+  clearForm(["cgf-id","cgf-nombre","cgf-topico","cgf-descripcion"]);
   toggleForm("comisionGlobalForm", true);
 };
 
@@ -796,6 +806,7 @@ qs("#saveComisionGlobalBtn").onclick = async () => {
   const data = {
     id:          qs("#cgf-id").value,
     nombre:      qs("#cgf-nombre").value.trim(),
+    topico:      qs("#cgf-topico").value.trim(),
     descripcion: qs("#cgf-descripcion").value.trim()
   };
   if (!data.nombre) { alert("El nombre de la comisión es requerido."); return; }
@@ -814,6 +825,7 @@ function editComisionGlobal(id) {
   qs("#comisionGlobalFormTitle").textContent = "Editar Comisión";
   qs("#cgf-id").value          = c.id;
   qs("#cgf-nombre").value      = c.nombre;
+  qs("#cgf-topico").value      = c.topico || "";
   qs("#cgf-descripcion").value = c.descripcion;
   toggleForm("comisionGlobalForm", true);
 }
@@ -844,11 +856,11 @@ function renderAsignacionesTable() {
     tr.innerHTML = `
       <td style="font-size:.82rem">${ev ? ev.title : a.evento_id}</td>
       <td>${com ? com.nombre : a.comision_id}</td>
-      <td style="font-size:.82rem;color:var(--text-muted)">${a.topico || "—"}</td>
+      <td style="font-size:.82rem;color:var(--text-muted)">${com ? (com.topico || "—") : "—"}</td>
       <td style="text-align:center"><span class="usos-badge">${mesas}</span></td>
       <td class="action-btns">
-        <button class="btn btn-sm" onclick="editAsignacion('${a.id}')">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAsignacion('${a.id}')">🗑️</button>
+        <button class="btn btn-sm" onclick="editAsignacion('${a.id}')">${ICON.edit}</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAsignacion('${a.id}')">${ICON.trash}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -856,7 +868,7 @@ function renderAsignacionesTable() {
 
 qs("#addAsignacionBtn").onclick = () => {
   qs("#asignacionFormTitle").textContent = "Nueva Asignación";
-  clearForm(["asf-id","asf-evento_id","asf-comision_id","asf-topico","asf-descripcion"]);
+  clearForm(["asf-id","asf-evento_id","asf-comision_id","asf-descripcion"]);
   toggleForm("asignacionForm", true);
 };
 
@@ -867,7 +879,6 @@ qs("#saveAsignacionBtn").onclick = async () => {
     id:          qs("#asf-id").value,
     evento_id:   qs("#asf-evento_id").value,
     comision_id: qs("#asf-comision_id").value,
-    topico:      qs("#asf-topico").value.trim(),
     descripcion: qs("#asf-descripcion").value.trim()
   };
   if (!data.evento_id || !data.comision_id) { alert("Evento y comisión son requeridos."); return; }
@@ -886,7 +897,6 @@ function editAsignacion(id) {
   qs("#asf-id").value          = a.id;
   qs("#asf-evento_id").value   = a.evento_id;
   qs("#asf-comision_id").value = a.comision_id;
-  qs("#asf-topico").value      = a.topico;
   qs("#asf-descripcion").value = a.descripcion;
   toggleForm("asignacionForm", true);
 }
@@ -916,8 +926,8 @@ function renderMesasDirectivasTable() {
       <td>${m.nombre}</td>
       <td style="font-size:.78rem;color:var(--text-muted)">${m.escuela || "—"}</td>
       <td class="action-btns">
-        <button class="btn btn-sm" onclick="editMesaDirectiva('${m.id}')">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteMesaDirectiva('${m.id}')">🗑️</button>
+        <button class="btn btn-sm" onclick="editMesaDirectiva('${m.id}')">${ICON.edit}</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteMesaDirectiva('${m.id}')">${ICON.trash}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -926,7 +936,7 @@ function renderMesasDirectivasTable() {
 qs("#addMesaDirectivaBtn").onclick = () => {
   qs("#mesaDirectivaFormTitle").textContent = "Nuevo Miembro";
   clearForm(["mdf-id","mdf-evento_id","mdf-comision_id","mdf-nombre","mdf-escuela"]);
-  qs("#mdf-role").value = "Presidente";
+  qs("#mdf-role").value = "Director/a";
   toggleForm("mesaDirectivaForm", true);
 };
 
@@ -990,4 +1000,7 @@ window.addEventListener("scroll", () => {
 scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
 // ── Init ──────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.lucide) lucide.createIcons();
+});
 loadAllData();

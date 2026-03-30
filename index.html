@@ -7,7 +7,7 @@
   <title>Calendario 2026-2027 CELIDER-08</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -26,8 +26,12 @@
       </button>
 
       <div class="controls">
-        <button id="refreshBtn" class="btn">↺ Actualizar</button>
-        <button id="adminBtn"   class="btn btn-admin" title="Panel Admin">🔒 Admin</button>
+        <button id="refreshBtn" class="btn">
+          <i data-lucide="rotate-cw"></i> Actualizar
+        </button>
+        <button id="adminBtn" class="btn btn-admin" title="Panel Admin">
+          <i data-lucide="lock"></i> Admin
+        </button>
       </div>
     </div>
   </header>
@@ -35,11 +39,17 @@
   <!-- ================= MOBILE MENU ================= -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú">
-    <button class="mobile-menu-close" id="menuClose" aria-label="Cerrar menú">✕</button>
+    <button class="mobile-menu-close" id="menuClose" aria-label="Cerrar menú">
+      <i data-lucide="x"></i>
+    </button>
     <p class="mobile-menu-title">Menú</p>
     <div class="mobile-menu-items">
-      <button id="refreshBtnMobile" class="btn">🔄 Actualizar</button>
-      <button id="adminBtnMobile"   class="btn">🔒 Panel Admin</button>
+      <button id="refreshBtnMobile" class="btn">
+        <i data-lucide="rotate-cw"></i> Actualizar
+      </button>
+      <button id="adminBtnMobile" class="btn">
+        <i data-lucide="lock"></i> Panel Admin
+      </button>
     </div>
   </div>
 
@@ -68,12 +78,16 @@
   <!-- ================= REGULAR EVENT MODAL ================= -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-card">
-      <button id="modalClose" class="modal-close">✕</button>
+      <button id="modalClose" class="modal-close">
+        <i data-lucide="x"></i>
+      </button>
       <h3 id="modalTitle"></h3>
       <p id="modalDate" class="muted"></p>
       <p id="modalDesc"></p>
       <img id="modalImg" class="modal-img" alt="">
-      <a id="modalPicsBtn" class="pics-access" target="_blank" rel="noopener">📷 Acceder a fotos</a>
+      <a id="modalPicsBtn" class="pics-access" target="_blank" rel="noopener">
+        <i data-lucide="camera"></i> Acceder a fotos
+      </a>
     </div>
   </div>
 
@@ -91,19 +105,25 @@
       <!-- Admin header -->
       <div class="admin-header">
         <div class="admin-header-left">
-          <span class="admin-logo">🔒</span>
+          <span class="admin-logo">
+            <i data-lucide="shield-check"></i>
+          </span>
           <div>
             <h2 class="admin-title">Panel Admin</h2>
             <p class="admin-subtitle">CELIDER-08 · Calendario 2026–2027</p>
           </div>
         </div>
-        <button id="adminClose" class="admin-close-btn">✕</button>
+        <button id="adminClose" class="admin-close-btn">
+          <i data-lucide="x"></i>
+        </button>
       </div>
 
       <!-- Password gate -->
       <div id="adminAuth" class="admin-auth">
         <div class="admin-auth-inner">
-          <div class="admin-lock-icon">🔐</div>
+          <div class="admin-lock-icon">
+            <i data-lucide="lock-keyhole"></i>
+          </div>
           <h3>Acceso restringido</h3>
           <p>Ingresa la contraseña de administrador para continuar.</p>
           <div class="admin-auth-form">
@@ -119,18 +139,35 @@
 
         <!-- Tabs -->
         <div class="admin-tabs">
-          <button class="admin-tab active"  data-tab="calendar">📅 Calendario</button>
-          <button class="admin-tab"         data-tab="modelos">🏛️ Modelos</button>
-          <button class="admin-tab"         data-tab="comisiones">📋 Comisiones</button>
-          <button class="admin-tab"         data-tab="asignaciones">🔗 Asignaciones</button>
-          <button class="admin-tab"         data-tab="mesas">👥 Mesas</button>
+          <button class="admin-tab active" data-tab="calendar">
+            <i data-lucide="calendar-days"></i>
+            <span class="tab-label">Calendario</span>
+          </button>
+          <button class="admin-tab" data-tab="modelos">
+            <i data-lucide="landmark"></i>
+            <span class="tab-label">Modelos</span>
+          </button>
+          <button class="admin-tab" data-tab="comisiones">
+            <i data-lucide="clipboard-list"></i>
+            <span class="tab-label">Comisiones</span>
+          </button>
+          <button class="admin-tab" data-tab="asignaciones">
+            <i data-lucide="link"></i>
+            <span class="tab-label">Asignaciones</span>
+          </button>
+          <button class="admin-tab" data-tab="mesas">
+            <i data-lucide="users"></i>
+            <span class="tab-label">Mesas</span>
+          </button>
         </div>
 
         <!-- ══════════ Tab: Calendar ══════════ -->
         <div id="tab-calendar" class="admin-tab-pane active">
           <div class="tab-toolbar">
             <h3 class="tab-title">Eventos del Calendario</h3>
-            <button class="btn btn-primary btn-sm" id="addCalendarBtn">+ Agregar evento</button>
+            <button class="btn btn-primary btn-sm" id="addCalendarBtn">
+              <i data-lucide="plus"></i> Agregar evento
+            </button>
           </div>
           <div id="calendarForm" class="admin-form" style="display:none">
             <h4 class="form-title" id="calendarFormTitle">Nuevo Evento</h4>
@@ -175,7 +212,9 @@
         <div id="tab-modelos" class="admin-tab-pane">
           <div class="tab-toolbar">
             <h3 class="tab-title">Metadata de Modelos</h3>
-            <button class="btn btn-primary btn-sm" id="addModeloBtn">+ Agregar</button>
+            <button class="btn btn-primary btn-sm" id="addModeloBtn">
+              <i data-lucide="plus"></i> Agregar
+            </button>
           </div>
           <p class="tab-hint">Información adicional (imagen, edición) que puede vincularse a un evento del calendario vía "Modelo vinculado".</p>
           <div id="modeloForm" class="admin-form" style="display:none">
@@ -206,14 +245,17 @@
         <div id="tab-comisiones" class="admin-tab-pane">
           <div class="tab-toolbar">
             <h3 class="tab-title">Catálogo de Comisiones</h3>
-            <button class="btn btn-primary btn-sm" id="addComisionGlobalBtn">+ Nueva comisión</button>
+            <button class="btn btn-primary btn-sm" id="addComisionGlobalBtn">
+              <i data-lucide="plus"></i> Nueva comisión
+            </button>
           </div>
-          <p class="tab-hint">Define las comisiones disponibles globalmente. Una misma comisión puede reutilizarse en múltiples modelos.</p>
+          <p class="tab-hint">Define las comisiones disponibles globalmente. Una misma comisión puede reutilizarse en múltiples modelos. El tópico fijo es el tema permanente de la comisión.</p>
           <div id="comisionGlobalForm" class="admin-form" style="display:none">
             <h4 class="form-title" id="comisionGlobalFormTitle">Nueva Comisión</h4>
             <div class="form-grid">
               <input type="hidden" id="cgf-id">
               <div class="form-field full"><label>Nombre de la comisión *</label><input type="text" id="cgf-nombre" class="admin-input" placeholder="Ej: Comisión de Medio Ambiente"></div>
+              <div class="form-field full"><label>Tópico fijo</label><input type="text" id="cgf-topico" class="admin-input" placeholder="Ej: Cambio climático y biodiversidad global"></div>
               <div class="form-field full"><label>Descripción</label><textarea id="cgf-descripcion" class="admin-input" rows="3" placeholder="Descripción del alcance de esta comisión…"></textarea></div>
             </div>
             <div class="form-actions">
@@ -223,7 +265,15 @@
           </div>
           <div class="admin-table-wrap">
             <table class="admin-table">
-              <thead><tr><th>Comisión</th><th>Descripción</th><th style="text-align:center">Usos</th><th>Acciones</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Comisión</th>
+                  <th>Tópico fijo</th>
+                  <th>Descripción</th>
+                  <th style="text-align:center">Usos</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
               <tbody id="comisionesTbody"></tbody>
             </table>
           </div>
@@ -233,9 +283,11 @@
         <div id="tab-asignaciones" class="admin-tab-pane">
           <div class="tab-toolbar">
             <h3 class="tab-title">Asignaciones Evento ↔ Comisión</h3>
-            <button class="btn btn-primary btn-sm" id="addAsignacionBtn">+ Nueva asignación</button>
+            <button class="btn btn-primary btn-sm" id="addAsignacionBtn">
+              <i data-lucide="plus"></i> Nueva asignación
+            </button>
           </div>
-          <p class="tab-hint">Asigna qué comisiones del catálogo participarán en cada Modelo Distrital, y define el tópico específico para ese evento.</p>
+          <p class="tab-hint">Asigna qué comisiones del catálogo participarán en cada Modelo Distrital. El tópico se hereda automáticamente de la comisión global.</p>
           <div id="asignacionForm" class="admin-form" style="display:none">
             <h4 class="form-title" id="asignacionFormTitle">Nueva Asignación</h4>
             <div class="form-grid">
@@ -248,8 +300,7 @@
                 <label>Comisión del catálogo *</label>
                 <select id="asf-comision_id" class="admin-input"><option value="">— Seleccionar comisión —</option></select>
               </div>
-              <div class="form-field full"><label>Tópico para este evento</label><input type="text" id="asf-topico" class="admin-input" placeholder="Ej: Cambio climático y acción local"></div>
-              <div class="form-field full"><label>Descripción adicional</label><textarea id="asf-descripcion" class="admin-input" rows="2" placeholder="Contexto, alcance…"></textarea></div>
+              <div class="form-field full"><label>Descripción adicional</label><textarea id="asf-descripcion" class="admin-input" rows="2" placeholder="Contexto o notas adicionales para este evento…"></textarea></div>
             </div>
             <div class="form-actions">
               <button class="btn btn-primary" id="saveAsignacionBtn">Guardar</button>
@@ -258,7 +309,7 @@
           </div>
           <div class="admin-table-wrap">
             <table class="admin-table">
-              <thead><tr><th>Evento</th><th>Comisión</th><th>Tópico</th><th style="text-align:center">Miembros</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Evento</th><th>Comisión</th><th>Tópico fijo</th><th style="text-align:center">Miembros</th><th>Acciones</th></tr></thead>
               <tbody id="asignacionesTbody"></tbody>
             </table>
           </div>
@@ -268,7 +319,9 @@
         <div id="tab-mesas" class="admin-tab-pane">
           <div class="tab-toolbar">
             <h3 class="tab-title">Mesas Directivas</h3>
-            <button class="btn btn-primary btn-sm" id="addMesaDirectivaBtn">+ Agregar miembro</button>
+            <button class="btn btn-primary btn-sm" id="addMesaDirectivaBtn">
+              <i data-lucide="user-plus"></i> Agregar miembro
+            </button>
           </div>
           <p class="tab-hint">Los miembros de mesa son específicos por evento y comisión. Dos eventos pueden tener la misma comisión con diferentes mesas.</p>
           <div id="mesaDirectivaForm" class="admin-form" style="display:none">
@@ -286,13 +339,9 @@
               <div class="form-field">
                 <label>Cargo *</label>
                 <select id="mdf-role" class="admin-input">
-                  <option value="Presidente">Presidente/a</option>
-                  <option value="Vicepresidente">Vicepresidente/a</option>
-                  <option value="Moderador">Moderador/a</option>
-                  <option value="Secretario">Secretario/a</option>
-                  <option value="Relator">Relator/a</option>
-                  <option value="Asesor">Asesor/a</option>
-                  <option value="Delegado">Delegado/a</option>
+                  <option value="Director/a">Director/a</option>
+                  <option value="Director Adjunto/a">Director Adjunto/a</option>
+                  <option value="Evaluación y Control">Evaluación y Control</option>
                   <option value="Otro">Otro</option>
                 </select>
               </div>
@@ -325,6 +374,8 @@
 
   <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Volver arriba"></button>
 
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

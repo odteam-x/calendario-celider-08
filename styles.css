@@ -50,7 +50,22 @@
   --shadow:     var(--glass-shadow);
 
   --font-ui:   'Barlow', system-ui, sans-serif;
-  --font-body: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Source Sans 3', system-ui, sans-serif;
+}
+
+/* ================= LUCIDE ICONS ================= */
+i[data-lucide] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -0.15em;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+i[data-lucide] svg {
+  width: 100%;
+  height: 100%;
 }
 
 /* ================= RESET ================= */
@@ -97,7 +112,7 @@ body {
 }
 
 .logo-title { display: flex; align-items: center; gap: 12px; }
-.logo { height: 40px; width: auto; }
+.logo { height: 52px; width: auto; }
 
 .logo-title h1 {
   font-family: var(--font-ui);
@@ -126,6 +141,7 @@ body {
   border-radius: var(--radius-sm); font-family: var(--font-ui);
   font-size: 0.86rem; font-weight: 600; cursor: pointer;
   transition: var(--transition); white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
 }
 .btn:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-1px); box-shadow: var(--glass-shine), 0 5px 18px rgba(0,0,0,0.25); }
 .btn:active { transform: scale(0.97); }
@@ -579,14 +595,10 @@ body {
 }
 
 /* Role-specific badge colors */
-.role-presidente    { background: rgba(212,168,67,0.2);  border: 1px solid rgba(212,168,67,0.4);  color: var(--gold); }
-.role-vicepresidente{ background: rgba(79,142,247,0.18); border: 1px solid rgba(79,142,247,0.35); color: #93c5fd; }
-.role-moderador     { background: rgba(168,85,247,0.18); border: 1px solid rgba(168,85,247,0.35); color: #c4b5fd; }
-.role-secretario    { background: rgba(34,197,94,0.15);  border: 1px solid rgba(34,197,94,0.3);   color: #86efac; }
-.role-relator       { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.32); color: #fcd34d; }
-.role-asesor        { background: rgba(20,184,166,0.16); border: 1px solid rgba(20,184,166,0.3);  color: #5eead4; }
-.role-delegado      { background: rgba(239,68,68,0.14);  border: 1px solid rgba(239,68,68,0.28);  color: #fca5a5; }
-.role-otro          { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-muted); }
+.role-director           { background: rgba(212,168,67,0.2);  border: 1px solid rgba(212,168,67,0.4);  color: var(--gold); }
+.role-director-adjunto   { background: rgba(79,142,247,0.18); border: 1px solid rgba(79,142,247,0.35); color: #93c5fd; }
+.role-evaluacion-control { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.32); color: #fcd34d; }
+.role-otro               { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text-muted); }
 
 .mesa-name   { font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
 .mesa-school { font-family: var(--font-ui); font-size: 0.72rem; color: var(--text-muted); }
@@ -616,7 +628,8 @@ body {
   padding: 20px 26px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
 }
 .admin-header-left { display: flex; align-items: center; gap: 14px; }
-.admin-logo { font-size: 1.4rem; }
+.admin-logo { font-size: 1.4rem; display: flex; align-items: center; color: var(--modelo-text); }
+.admin-logo i[data-lucide] { width: 1.4rem; height: 1.4rem; }
 .admin-title { font-family: var(--font-ui); font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
 .admin-subtitle { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
 
@@ -630,7 +643,13 @@ body {
 
 .admin-auth { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
 .admin-auth-inner { text-align: center; max-width: 340px; }
-.admin-lock-icon { font-size: 3rem; margin-bottom: 16px; }
+.admin-lock-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px;
+  background: rgba(255, 100, 88, 0.12); border: 1px solid rgba(255, 100, 88, 0.25);
+  color: var(--modelo-text);
+}
+.admin-lock-icon i[data-lucide] { width: 2rem; height: 2rem; }
 .admin-auth-inner h3 { font-family: var(--font-ui); font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 .admin-auth-inner p { font-family: var(--font-body); font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
 .admin-auth-form { display: flex; gap: 10px; align-items: stretch; }
@@ -649,7 +668,9 @@ select.admin-input  { cursor: pointer; }
 .admin-tabs {
   display: flex; gap: 4px; padding: 14px 20px 0;
   border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
+.admin-tabs::-webkit-scrollbar { display: none; }
 .admin-tab {
   font-family: var(--font-ui); font-size: 0.82rem; font-weight: 600;
   background: none; border: none; color: var(--text-muted);
@@ -657,7 +678,10 @@ select.admin-input  { cursor: pointer; }
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: var(--transition); white-space: nowrap;
   border-bottom: 2px solid transparent;
+  display: inline-flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
 }
+.admin-tab i[data-lucide] { width: 14px; height: 14px; }
 .admin-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 .admin-tab.active { color: #93c5fd; border-bottom-color: #4f8ef7; background: rgba(79,142,247,0.08); }
 
@@ -666,8 +690,12 @@ select.admin-input  { cursor: pointer; }
 .admin-tab-pane { display: none; flex-direction: column; flex: 1; overflow: hidden; padding: 18px 20px 20px; }
 .admin-tab-pane.active { display: flex; }
 
-.tab-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-shrink: 0; }
-.tab-title { font-family: var(--font-ui); font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+.tab-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 8px; flex-shrink: 0; flex-wrap: wrap;
+}
+.tab-toolbar .btn-sm { flex-shrink: 0; white-space: nowrap; }
+.tab-title { font-family: var(--font-ui); font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; min-width: 0; }
 
 .tab-hint {
   font-family: var(--font-body); font-size: 0.82rem; color: var(--text-muted);
@@ -747,7 +775,7 @@ select.admin-input  { cursor: pointer; }
   .logo-header { flex-wrap: nowrap; }
   .logo-title h1 { font-size: 0.88rem; }
   .title-badge { display: none; }
-  .logo { height: 32px; }
+  .logo { height: 42px; }
   .hamburger { display: flex; }
   .controls  { display: none; }
 
@@ -771,20 +799,78 @@ select.admin-input  { cursor: pointer; }
 
   .modal-card { padding: 20px; border-radius: var(--radius-md); }
   .scroll-top-btn { bottom: 18px; right: 18px; width: 40px; height: 40px; }
-
-  .admin-panel { max-height: 96vh; border-radius: var(--radius-lg); max-width: 100%; }
-  .form-grid { grid-template-columns: 1fr; }
-  .admin-tabs { padding: 10px 14px 0; }
-  .admin-tab  { font-size: 0.74rem; padding: 8px 10px; }
 }
 
-@media (max-width: 480px) {
+/* ── Admin panel — mobile sheet (slides up from bottom) ── */
+@media (max-width: 700px) {
+  .admin-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .admin-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: 95dvh;
+    max-height: 95vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    animation: slideUpSheet 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  @keyframes slideUpSheet {
+    from { opacity: 0; transform: translateY(60px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header */
+  .admin-header { padding: 16px 18px; }
+  .admin-title  { font-size: 0.98rem; }
+  .admin-subtitle { font-size: 0.7rem; }
+
+  /* Tabs — icon only on very small, label on normal mobile */
+  .admin-tabs { padding: 10px 14px 0; gap: 2px; }
+  .admin-tab  { padding: 9px 10px; font-size: 0.76rem; gap: 4px; }
+
+  /* Tab content */
+  .admin-tab-pane { padding: 14px 14px 16px; }
+
+  /* Toolbar */
+  .tab-toolbar { gap: 8px; }
+  .tab-title    { font-size: 0.9rem; }
+
+  /* Forms */
+  .admin-form   { padding: 14px; }
+  .form-grid    { grid-template-columns: 1fr; }
+  .form-actions { flex-wrap: wrap; }
+  .form-actions .btn { flex: 1; min-width: 0; justify-content: center; }
+
+  /* Tables: horizontal scroll */
+  .admin-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-table { min-width: 480px; }
+
+  /* Tighter table cells */
+  .admin-table thead th { padding: 8px 10px; font-size: 0.62rem; }
+  .admin-table td { padding: 8px 10px; font-size: 0.8rem; }
+  .action-btns { gap: 4px; }
+  .action-btns .btn { padding: 5px 8px; }
+
+  /* Auth */
+  .admin-auth { padding: 28px 16px; }
+  .admin-auth-form { flex-direction: column; gap: 8px; }
+  .admin-auth-form .btn { width: 100%; justify-content: center; }
+}
+
+/* Extra small phones */
+@media (max-width: 400px) {
+  .admin-tab .tab-label { display: none; }
+  .admin-tab { padding: 9px 11px; }
+  .admin-tab i[data-lucide] { width: 16px; height: 16px; }
+
   .mesa-grid { grid-template-columns: 1fr; }
   .modelo-stats { padding: 10px 16px; }
   .ms-value { font-size: 1.1rem; }
-}
-
-@media (max-width: 380px) {
   .day-cell   { padding: 5px 0; font-size: 0.7rem; }
   .month-card { padding: 12px; }
 }
