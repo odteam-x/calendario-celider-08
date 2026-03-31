@@ -1,6 +1,7 @@
 /* ================================================================
-   CELIDER-08 Calendar — Styles v2.0
-   Enhanced Modelo Distrital modal, commission panels, role cards
+   CELIDER-08 Calendar — Styles v3.1
+   All 8 improvements: aviso highlight, link button, multi-event,
+   modelo chooser, password lock, cover image, scroll cards, responsive
 ================================================================ */
 
 /* ================= VARIABLES ================= */
@@ -353,15 +354,21 @@ body {
 }
 .modal.open { display: flex; }
 
+/* 7 — Regular modal card: scrollable */
 .modal-card {
   background: rgba(10, 26, 56, 0.88);
   backdrop-filter: blur(32px) saturate(2); -webkit-backdrop-filter: blur(32px) saturate(2);
   border: 1px solid rgba(255,255,255,0.17);
   box-shadow: 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.05);
   border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 520px;
-  max-height: 88vh; overflow-y: auto; position: relative;
+  max-height: 88vh; overflow-y: auto; overscroll-behavior: contain; position: relative;
   animation: glassIn 0.26s cubic-bezier(0.34,1.4,0.64,1);
 }
+
+/* Custom scrollbar for regular modal */
+.modal-card::-webkit-scrollbar { width: 5px; }
+.modal-card::-webkit-scrollbar-track { background: transparent; }
+.modal-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
 
 @keyframes glassIn {
   from { opacity: 0; transform: translateY(20px) scale(0.96); }
@@ -395,28 +402,35 @@ body {
 .pics-access:hover { background: rgba(34,197,94,0.19); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(34,197,94,0.15), inset 0 1px 0 rgba(255,255,255,0.12); }
 
 /* ═══════════════════════════════════════════════════════════════
-   MODELO DISTRITAL MODAL  — Enhanced v2.0
+   MODELO DISTRITAL MODAL  — v3.1 with scroll body fix
 ═══════════════════════════════════════════════════════════════ */
 
+/* 7 — Modelo modal: flex column, hero+stats fixed, content scrolls */
 .modelo-modal-card {
   max-width: 700px;
   padding: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
 }
 
-/* Hero section */
+/* Hero section — fixed, does NOT scroll */
 .modelo-hero {
   position: relative;
   background: linear-gradient(145deg, rgba(18,50,110,0.95) 0%, rgba(10,30,70,0.98) 100%);
   padding: 28px 28px 22px;
   border-bottom: 1px solid rgba(79, 142, 247, 0.2);
+  flex-shrink: 0;
 }
 
+/* 6 — Cover image fully visible */
 .modelo-banner-img {
   width: 100%; height: 180px; object-fit: cover;
   border-radius: var(--radius-sm); margin-bottom: 18px;
   border: 1px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  display: block;
 }
 
 .modelo-hero-top {
@@ -453,12 +467,13 @@ body {
   font-family: var(--font-ui); font-size: 0.82rem; color: var(--text-muted);
 }
 
-/* Stats bar */
+/* Stats bar — fixed, does NOT scroll */
 .modelo-stats {
   display: flex; align-items: center;
   background: rgba(10, 30, 75, 0.7);
   border-bottom: 1px solid rgba(79, 142, 247, 0.15);
   padding: 14px 28px;
+  flex-shrink: 0;
 }
 
 .modelo-stat { display: flex; flex-direction: column; align-items: center; flex: 1; }
@@ -466,12 +481,34 @@ body {
 .ms-label { font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 3px; }
 .modelo-stat-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.1); margin: 0 16px; flex-shrink: 0; }
 
+/* 7 — Scroll wrapper: everything below stats scrolls here */
+.modelo-scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.modelo-scroll-body::-webkit-scrollbar { width: 5px; }
+.modelo-scroll-body::-webkit-scrollbar-track { background: transparent; }
+.modelo-scroll-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
 /* Description */
 .modelo-description {
   font-family: var(--font-body); font-size: 0.93rem;
   line-height: 1.7; color: rgba(238, 242, 255, 0.78);
   padding: 18px 28px 0;
 }
+
+/* 2 — Link button inside modelo modal */
+.modelo-link-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 16px 28px 0; padding: 13px 20px;
+  background: rgba(79, 142, 247, 0.11);
+  border: 1px solid rgba(79, 142, 247, 0.3);
+  color: #93c5fd; font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+  text-decoration: none; border-radius: var(--radius-sm); transition: var(--transition);
+}
+.modelo-link-btn:hover { background: rgba(79,142,247,0.2); transform: translateY(-1px); }
 
 /* Commissions section */
 .comisiones-section { padding: 20px 28px 28px; }
@@ -641,6 +678,7 @@ body {
 }
 .admin-close-btn:hover { background: rgba(255,255,255,0.14); transform: rotate(90deg); }
 
+/* 5 — Auth gate */
 .admin-auth { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
 .admin-auth-inner { text-align: center; max-width: 340px; }
 .admin-lock-icon {
@@ -685,9 +723,24 @@ select.admin-input  { cursor: pointer; }
 .admin-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 .admin-tab.active { color: #93c5fd; border-bottom-color: #4f8ef7; background: rgba(79,142,247,0.08); }
 
-.admin-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+/* 7 — Admin content area: flex so pane fills height */
+.admin-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
 
-.admin-tab-pane { display: none; flex-direction: column; flex: 1; overflow: hidden; padding: 18px 20px 20px; }
+/* 7 — Admin tab pane: toolbar+form fixed, table scrolls inside */
+.admin-tab-pane {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  padding: 18px 20px 20px;
+  min-height: 0;
+}
 .admin-tab-pane.active { display: flex; }
 
 .tab-toolbar {
@@ -708,7 +761,11 @@ select.admin-input  { cursor: pointer; }
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-md); padding: 18px; margin-bottom: 14px;
   flex-shrink: 0; animation: glassIn 0.2s ease;
+  /* 7 — form itself scrolls if very long on small screens */
+  max-height: 45vh; overflow-y: auto; overscroll-behavior: contain;
 }
+.admin-form::-webkit-scrollbar { width: 4px; }
+.admin-form::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
 
 .form-title { font-family: var(--font-ui); font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
 .form-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
@@ -717,13 +774,26 @@ select.admin-input  { cursor: pointer; }
 .form-field label { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .form-actions { display: flex; gap: 10px; }
 
-.admin-table-wrap { flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); }
+/* 7 — Table wrap: scrolls vertically, table header stays sticky */
+.admin-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.admin-table-wrap::-webkit-scrollbar { width: 5px; height: 5px; }
+.admin-table-wrap::-webkit-scrollbar-track { background: transparent; }
+.admin-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
 
 .admin-table { width: 100%; border-collapse: collapse; font-family: var(--font-ui); font-size: 0.83rem; }
 .admin-table thead th {
   background: rgba(255,255,255,0.06); padding: 10px 14px; text-align: left;
   font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
   color: var(--text-muted); position: sticky; top: 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+  white-space: nowrap;
 }
 .admin-table tbody tr  { border-bottom: 1px solid rgba(255,255,255,0.05); }
 .admin-table tbody tr:last-child { border-bottom: none; }
@@ -769,7 +839,176 @@ select.admin-input  { cursor: pointer; }
 .scroll-top-btn.show { opacity: 1; visibility: visible; transform: translateY(0); }
 .scroll-top-btn:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
 
-/* ================= RESPONSIVE ================= */
+/* ══════════════════════════════════════════════════════════
+   IMPROVEMENT 1 — Aviso highlight (pulse + glow + badge)
+══════════════════════════════════════════════════════════ */
+.day-cell.is-aviso {
+  /* Permanent hover-like brightness — looks "always hovered" */
+  filter: brightness(1.25) saturate(1.15);
+  animation: avisoPulse 2.2s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+.day-cell.is-aviso::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: rgba(236, 72, 153, 0.18);
+  pointer-events: none;
+  z-index: -1;
+}
+@keyframes avisoPulse {
+  0%, 100% {
+    filter: brightness(1.2) saturate(1.1);
+    box-shadow: 0 0 0 2px #ec4899, 0 0 10px rgba(236,72,153,.4);
+  }
+  50% {
+    filter: brightness(1.38) saturate(1.25);
+    box-shadow: 0 0 0 3px #f472b6, 0 0 26px rgba(236,72,153,.72);
+  }
+}
+.upcoming-card.is-aviso {
+  border-color: rgba(236, 72, 153, 0.6) !important;
+  box-shadow: 0 0 0 1px rgba(236,72,153,0.35), 0 6px 22px rgba(0,0,0,.32), var(--glass-shine) !important;
+  position: relative;
+}
+.upcoming-card.is-aviso::before {
+  content: "Aviso";
+  position: absolute;
+  top: -10px; right: 12px;
+  font-family: var(--font-ui); font-size: 0.6rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: #ec4899; color: #fff;
+  padding: 2px 8px; border-radius: 6px;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   IMPROVEMENT 2 — Link "Acceder" button
+══════════════════════════════════════════════════════════ */
+.link-access {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 10px; padding: 13px 20px;
+  background: rgba(79, 142, 247, 0.11);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(79, 142, 247, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  color: #93c5fd; font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+  text-decoration: none; border-radius: var(--radius-sm); transition: var(--transition);
+}
+.link-access:hover {
+  background: rgba(79, 142, 247, 0.2); transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(79,142,247,0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.link-chip { text-decoration: none; font-size: .72rem !important; }
+
+/* ══════════════════════════════════════════════════════════
+   IMPROVEMENT 3 — Multi-event: secondary event colored dots
+══════════════════════════════════════════════════════════ */
+.day-cell.multi-event { position: relative; }
+
+/* Container for secondary event dots (shown below the day number) */
+.sec-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+  line-height: 1;
+}
+/* Each dot matches the secondary event's type color */
+.sec-dot {
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
+.sec-actividad { background: #3b82f6; }
+.sec-visita    { background: #22c55e; }
+.sec-reunion   { background: #a855f7; }
+.sec-evento    { background: #f59e0b; }
+.sec-feriado   { background: #ef4444; }
+.sec-modelo    { background: #ff6458; }
+
+/* ══════════════════════════════════════════════════════════
+   IMPROVEMENT 4 — Event chooser (any type, not just modelos)
+══════════════════════════════════════════════════════════ */
+.chooser-card {
+  background: rgba(10, 26, 56, 0.92);
+  backdrop-filter: blur(32px) saturate(2); -webkit-backdrop-filter: blur(32px) saturate(2);
+  border: 1px solid rgba(255,255,255,0.17);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.22);
+  border-radius: var(--radius-lg); padding: 28px 26px;
+  width: 100%; max-width: 420px; position: relative;
+  /* 7 — chooser scrolls if many events */
+  max-height: 88vh; overflow-y: auto; overscroll-behavior: contain;
+  animation: glassIn 0.26s cubic-bezier(0.34,1.4,0.64,1);
+}
+.chooser-card::-webkit-scrollbar { width: 5px; }
+.chooser-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+.chooser-title {
+  font-family: var(--font-body); font-size: 1.1rem; font-weight: 600;
+  color: var(--text); margin-bottom: 6px; padding-right: 40px;
+  display: flex; align-items: center; gap: 8px;
+}
+.chooser-title svg { color: var(--accent); flex-shrink: 0; }
+.chooser-subtitle {
+  font-family: var(--font-ui); font-size: 0.82rem; color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.chooser-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* Base chooser item — neutral */
+.chooser-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  cursor: pointer; text-align: left; transition: var(--transition); width: 100%;
+}
+.chooser-item:hover { transform: translateY(-1px); filter: brightness(1.15); }
+
+/* Type-specific item colors */
+.chooser-item.tag-modelo  { background: var(--modelo-bg); border-color: var(--modelo-border); }
+.chooser-item.tag-actividad { background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.3); }
+.chooser-item.tag-visita    { background: rgba(34,197,94,0.14);  border-color: rgba(34,197,94,0.3); }
+.chooser-item.tag-reunion   { background: rgba(168,85,247,0.14); border-color: rgba(168,85,247,0.3); }
+.chooser-item.tag-evento    { background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.3); }
+.chooser-item.tag-feriado   { background: rgba(239,68,68,0.14);  border-color: rgba(239,68,68,0.3); }
+
+/* Chooser icon circle */
+.chooser-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: var(--text);
+}
+.chooser-icon.tag-modelo    { background: rgba(255,100,88,0.2);  color: var(--modelo-text); border-color: rgba(255,100,88,0.3); }
+.chooser-icon.tag-actividad { background: rgba(59,130,246,0.2);  color: #93c5fd;             border-color: rgba(59,130,246,0.3); }
+.chooser-icon.tag-visita    { background: rgba(34,197,94,0.2);   color: #86efac;             border-color: rgba(34,197,94,0.3); }
+.chooser-icon.tag-reunion   { background: rgba(168,85,247,0.2);  color: #d8b4fe;             border-color: rgba(168,85,247,0.3); }
+.chooser-icon.tag-evento    { background: rgba(245,158,11,0.2);  color: #fcd34d;             border-color: rgba(245,158,11,0.3); }
+.chooser-icon.tag-feriado   { background: rgba(239,68,68,0.2);   color: #fca5a5;             border-color: rgba(239,68,68,0.3); }
+
+.chooser-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.chooser-text strong { font-family: var(--font-body); font-size: 0.95rem; color: var(--text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chooser-text small  { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-muted); }
+
+/* ══════════════════════════════════════════════════════════
+   IMPROVEMENT 5 — Shake animation for wrong password
+══════════════════════════════════════════════════════════ */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+.admin-input.shake { animation: shake 0.5s ease; border-color: rgba(239,68,68,0.6) !important; }
+
+/* ================= BASE RESPONSIVE ================= */
 @media (max-width: 768px) {
   .topbar { padding: 12px 0; }
   .logo-header { flex-wrap: nowrap; }
@@ -794,6 +1033,7 @@ select.admin-input  { cursor: pointer; }
   .modelo-stats { padding: 12px 18px; }
   .ms-value { font-size: 1.2rem; }
   .comisiones-section { padding: 14px 18px 20px; }
+  .modelo-link-btn { margin: 14px 18px 0; }
   .mesa-grid { grid-template-columns: 1fr 1fr; }
   .com-panel-header { padding: 12px 14px; }
 
@@ -826,7 +1066,7 @@ select.admin-input  { cursor: pointer; }
   .admin-title  { font-size: 0.98rem; }
   .admin-subtitle { font-size: 0.7rem; }
 
-  /* Tabs — icon only on very small, label on normal mobile */
+  /* Tabs */
   .admin-tabs { padding: 10px 14px 0; gap: 2px; }
   .admin-tab  { padding: 9px 10px; font-size: 0.76rem; gap: 4px; }
 
@@ -838,19 +1078,13 @@ select.admin-input  { cursor: pointer; }
   .tab-title    { font-size: 0.9rem; }
 
   /* Forms */
-  .admin-form   { padding: 14px; }
+  .admin-form   { padding: 14px; max-height: 40vh; }
   .form-grid    { grid-template-columns: 1fr; }
   .form-actions { flex-wrap: wrap; }
   .form-actions .btn { flex: 1; min-width: 0; justify-content: center; }
 
-  /* Tables: horizontal scroll */
-  .admin-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+  /* Tables: min-width to allow horizontal scroll */
   .admin-table { min-width: 480px; }
-
-  /* Tighter table cells */
   .admin-table thead th { padding: 8px 10px; font-size: 0.62rem; }
   .admin-table td { padding: 8px 10px; font-size: 0.8rem; }
   .action-btns { gap: 4px; }
@@ -860,9 +1094,62 @@ select.admin-input  { cursor: pointer; }
   .admin-auth { padding: 28px 16px; }
   .admin-auth-form { flex-direction: column; gap: 8px; }
   .admin-auth-form .btn { width: 100%; justify-content: center; }
+
+  /* Chooser */
+  .chooser-card { padding: 22px 18px; max-height: 90dvh; max-height: 90vh; }
 }
 
-/* Extra small phones */
+/* ══════════════════════════════════════════════════════════
+   IMPROVEMENT 8 — Enhanced responsive breakpoints
+══════════════════════════════════════════════════════════ */
+
+/* Tablet: switch to single column */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { order: 1; }
+  #calendarArea { order: 2; }
+}
+
+/* Tablets: 2-column month grid */
+@media (min-width: 601px) and (max-width: 900px) {
+  .months { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  .past-months-divider { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+  /* Modals fill more screen */
+  .modal { padding: 10px; }
+  .modal-card { padding: 18px; max-height: 92vh; border-radius: var(--radius-md); }
+  .chooser-card { padding: 20px 16px; max-height: 88vh; }
+  #modeloModal .modal-card { border-radius: var(--radius-md); max-height: 95dvh; max-height: 95vh; }
+  .modelo-hero { padding: 16px 16px 14px; }
+  .modelo-banner-img { height: 140px; }
+  .modelo-title { font-size: 1.05rem; padding-right: 40px; }
+  .modelo-stats { padding: 10px 16px; }
+  .modelo-stat-divider { margin: 0 10px; }
+  .ms-value { font-size: 1.1rem; }
+  .comisiones-section { padding: 12px 16px 18px; }
+  .modelo-link-btn { margin: 12px 16px 0; }
+  .modelo-description { padding: 14px 16px 0; }
+
+  /* Calendar cells */
+  .day-cell { padding: 6px 0; font-size: 0.76rem; border-radius: 8px; }
+  .month-card { padding: 12px 10px; }
+  .month-grid { gap: 3px; }
+
+  /* Upcoming cards */
+  .upcoming-card { padding: 12px 14px; }
+  .event-name { font-size: 0.88rem; }
+
+  /* Legend */
+  .legend-items { gap: 8px 14px; }
+
+  /* Chooser items */
+  .chooser-item { padding: 12px 14px; gap: 12px; }
+  .chooser-icon { width: 32px; height: 32px; }
+  .chooser-text strong { font-size: 0.88rem; }
+}
+
 @media (max-width: 400px) {
   .admin-tab .tab-label { display: none; }
   .admin-tab { padding: 9px 11px; }
@@ -870,7 +1157,8 @@ select.admin-input  { cursor: pointer; }
 
   .mesa-grid { grid-template-columns: 1fr; }
   .modelo-stats { padding: 10px 16px; }
-  .ms-value { font-size: 1.1rem; }
-  .day-cell   { padding: 5px 0; font-size: 0.7rem; }
-  .month-card { padding: 12px; }
+  .ms-value { font-size: 1rem; }
+  .day-cell   { padding: 4px 0; font-size: 0.68rem; }
+  .month-card { padding: 10px 8px; }
+  .range-badge { display: none; }
 }
