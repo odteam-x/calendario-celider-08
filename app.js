@@ -461,7 +461,7 @@ function buildModeloModalContent(ev, meta, asignaciones, totalMiembros) {
         <div class="modelo-hero-top">
           <span class="modelo-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 22V12a9 9 0 0118 0v10"/><path d="M9 22V12h6v10"/></svg>
-            Modelo Distrital · MUN
+            Modelo de las Naciones Unidas· MUN
           </span>
           ${meta.edition ? `<span class="modelo-edition-pill">${meta.edition}</span>` : ""}
         </div>
