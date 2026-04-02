@@ -1,7 +1,7 @@
 /* ================================================================
-   CELIDER-08 Calendar — Styles v3.1
-   All 8 improvements: aviso highlight, link button, multi-event,
-   modelo chooser, password lock, cover image, scroll cards, responsive
+   CELIDER-08 Calendar — Styles v4.0
+   Updated color system, Efemérides/MUNs categories,
+   mobile accordion, enhanced responsive
 ================================================================ */
 
 /* ================= VARIABLES ================= */
@@ -23,13 +23,22 @@
   --text-light: rgba(238, 242, 255, 0.3);
   --accent:     #4f8ef7;
 
-  /* Modelo Distrital — coral from the logo */
-  --modelo-bg:     rgba(255, 100, 88, 0.22);
-  --modelo-border: rgba(255, 100, 88, 0.38);
-  --modelo-text:   #ff9d96;
-  --modelo-solid:  #ff6458;
+  /* ── Category colors (OBLIGATORY) ── */
+  --c-actividad:  #3B82F6;
+  --c-visita:     #22C55E;
+  --c-reunion:    #8B5CF6;
+  --c-evento:     #F97316;
+  --c-muns:       #EF4444;
+  --c-aviso:      #EAB308;
+  --c-efemerides: #374151;
 
-  /* Cream / gold accents (for commission numbers & directiva) */
+  /* MUNs (formerly Modelo Distrital) */
+  --muns-bg:     rgba(239, 68, 68, 0.22);
+  --muns-border: rgba(239, 68, 68, 0.38);
+  --muns-text:   #fca5a5;
+  --muns-solid:  #EF4444;
+
+  /* Cream / gold accents */
   --cream:         #f5e6c8;
   --cream-muted:   rgba(245, 230, 200, 0.6);
   --gold:          #d4a843;
@@ -123,8 +132,8 @@ body {
 
 .title-badge {
   display: inline-block;
-  background: var(--modelo-bg); border: 1px solid var(--modelo-border);
-  color: var(--modelo-text);
+  background: var(--muns-bg); border: 1px solid var(--muns-border);
+  color: var(--muns-text);
   font-size: 0.75em; font-weight: 800; letter-spacing: 0.06em;
   padding: 2px 8px; border-radius: 6px;
   vertical-align: middle; margin-left: 4px;
@@ -147,8 +156,8 @@ body {
 .btn:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-1px); box-shadow: var(--glass-shine), 0 5px 18px rgba(0,0,0,0.25); }
 .btn:active { transform: scale(0.97); }
 
-.btn-admin   { background: var(--modelo-bg); border-color: var(--modelo-border); color: var(--modelo-text); }
-.btn-admin:hover { background: rgba(255, 100, 88, 0.32); }
+.btn-admin   { background: var(--muns-bg); border-color: var(--muns-border); color: var(--muns-text); }
+.btn-admin:hover { background: rgba(239, 68, 68, 0.32); }
 
 .btn-primary { background: rgba(79, 142, 247, 0.22); border-color: rgba(79, 142, 247, 0.4); color: #93c5fd; }
 .btn-primary:hover { background: rgba(79, 142, 247, 0.34); }
@@ -250,14 +259,34 @@ body {
 .day-cell.is-today { outline: 2px solid rgba(147, 197, 253, 0.6); outline-offset: -2px; font-weight: 700; }
 .day-cell.is-today:not(.has-event) { background: rgba(79, 142, 247, 0.15); color: #93c5fd; }
 
-/* ================= EVENT COLORS ================= */
+/* ================= EVENT COLORS — v4.0 ================= */
 .has-event { font-weight: 700; }
-.tag-actividad { background: rgba(59,  130, 246, 0.26); color: #93c5fd;  border: 1px solid rgba(59,  130, 246, 0.26); }
-.tag-visita    { background: rgba(34,  197,  94, 0.24); color: #86efac;  border: 1px solid rgba(34,  197,  94, 0.24); }
-.tag-reunion   { background: rgba(168,  85, 247, 0.24); color: #d8b4fe;  border: 1px solid rgba(168,  85, 247, 0.24); }
-.tag-evento    { background: rgba(245, 158,  11, 0.24); color: #fcd34d;  border: 1px solid rgba(245, 158,  11, 0.24); }
-.tag-feriado   { background: rgba(239,  68,  68, 0.24); color: #fca5a5;  border: 1px solid rgba(239,  68,  68, 0.24); }
-.tag-modelo    { background: var(--modelo-bg); color: var(--modelo-text); border: 1px solid var(--modelo-border); }
+
+/* Actividad — Blue #3B82F6 */
+.tag-actividad { background: rgba(59, 130, 246, 0.26); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.30); }
+
+/* Visita — Green #22C55E */
+.tag-visita { background: rgba(34, 197, 94, 0.24); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.28); }
+
+/* Reunión — Purple #8B5CF6 */
+.tag-reunion { background: rgba(139, 92, 246, 0.24); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.30); }
+
+/* Evento — Orange #F97316 */
+.tag-evento { background: rgba(249, 115, 22, 0.24); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.30); }
+
+/* MUNs — Red #EF4444 */
+.tag-muns { background: var(--muns-bg); color: var(--muns-text); border: 1px solid var(--muns-border); }
+
+/* Aviso — Yellow #EAB308 */
+.tag-aviso { background: rgba(234, 179, 8, 0.22); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.30); }
+
+/* Efemérides — Dark gray #374151 */
+.tag-efemerides { background: rgba(55, 65, 81, 0.50); color: #d1d5db; border: 1px solid rgba(55, 65, 81, 0.60); }
+
+/* Legacy compatibility: map old feriado → efemerides, modelo → muns */
+.tag-feriado { background: rgba(55, 65, 81, 0.50); color: #d1d5db; border: 1px solid rgba(55, 65, 81, 0.60); }
+.tag-modelo  { background: var(--muns-bg); color: var(--muns-text); border: 1px solid var(--muns-border); }
+
 .has-event:hover { filter: brightness(1.2); }
 
 /* Multi-day range */
@@ -322,8 +351,8 @@ body {
 }
 .upcoming-mun-badge {
   font-family: var(--font-ui); font-size: 0.64rem; font-weight: 800;
-  letter-spacing: 0.08em; background: var(--modelo-bg); border: 1px solid var(--modelo-border);
-  color: var(--modelo-text); padding: 2px 7px; border-radius: 5px;
+  letter-spacing: 0.08em; background: var(--muns-bg); border: 1px solid var(--muns-border);
+  color: var(--muns-text); padding: 2px 7px; border-radius: 5px;
 }
 
 /* ================= LEGEND ================= */
@@ -337,12 +366,25 @@ body {
 .legend-items { display: flex; flex-wrap: wrap; gap: 10px 18px; }
 .legend-item  { display: flex; align-items: center; gap: 8px; font-family: var(--font-ui); font-size: 0.84rem; }
 .legend-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-dot.tag-actividad { background: #3b82f6; }
-.legend-dot.tag-visita    { background: #22c55e; }
-.legend-dot.tag-reunion   { background: #a855f7; }
-.legend-dot.tag-evento    { background: #f59e0b; }
-.legend-dot.tag-feriado   { background: #ef4444; }
-.legend-dot.tag-modelo    { background: var(--modelo-solid); }
+.legend-dot.tag-actividad  { background: var(--c-actividad); }
+.legend-dot.tag-visita     { background: var(--c-visita); }
+.legend-dot.tag-reunion    { background: var(--c-reunion); }
+.legend-dot.tag-evento     { background: var(--c-evento); }
+.legend-dot.tag-muns       { background: var(--c-muns); }
+.legend-dot.tag-aviso      { background: var(--c-aviso); }
+.legend-dot.tag-efemerides { background: var(--c-efemerides); }
+/* Legacy */
+.legend-dot.tag-feriado    { background: var(--c-efemerides); }
+.legend-dot.tag-modelo     { background: var(--c-muns); }
+
+/* ================= MOBILE LEGEND ================= */
+.mobile-legend {
+  display: none;
+  margin-top: 20px; margin-bottom: 10px; padding: 16px 18px;
+  background: var(--glass-bg); backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-shine);
+  border-radius: var(--radius-md);
+}
 
 /* ================= MODAL (regular events) ================= */
 .modal {
@@ -354,7 +396,6 @@ body {
 }
 .modal.open { display: flex; }
 
-/* 7 — Regular modal card: scrollable */
 .modal-card {
   background: rgba(10, 26, 56, 0.88);
   backdrop-filter: blur(32px) saturate(2); -webkit-backdrop-filter: blur(32px) saturate(2);
@@ -365,7 +406,6 @@ body {
   animation: glassIn 0.26s cubic-bezier(0.34,1.4,0.64,1);
 }
 
-/* Custom scrollbar for regular modal */
 .modal-card::-webkit-scrollbar { width: 5px; }
 .modal-card::-webkit-scrollbar-track { background: transparent; }
 .modal-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
@@ -401,11 +441,10 @@ body {
 }
 .pics-access:hover { background: rgba(34,197,94,0.19); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(34,197,94,0.15), inset 0 1px 0 rgba(255,255,255,0.12); }
 
-/* ═══════════════════════════════════════════════════════════════
-   MODELO DISTRITAL MODAL  — v3.1 with scroll body fix
-═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   MODELO (MUNs) MODAL — v4.0
+═══════════════════════════════════════════════════ */
 
-/* 7 — Modelo modal: flex column, hero+stats fixed, content scrolls */
 .modelo-modal-card {
   max-width: 700px;
   padding: 0;
@@ -415,7 +454,6 @@ body {
   max-height: 90vh;
 }
 
-/* Hero section — fixed, does NOT scroll */
 .modelo-hero {
   position: relative;
   background: linear-gradient(145deg, rgba(18,50,110,0.95) 0%, rgba(10,30,70,0.98) 100%);
@@ -424,7 +462,6 @@ body {
   flex-shrink: 0;
 }
 
-/* 6 — Cover image fully visible */
 .modelo-banner-img {
   width: 100%; height: 180px; object-fit: cover;
   border-radius: var(--radius-sm); margin-bottom: 18px;
@@ -440,8 +477,8 @@ body {
 
 .modelo-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  background: var(--modelo-bg); border: 1px solid var(--modelo-border);
-  color: var(--modelo-text);
+  background: var(--muns-bg); border: 1px solid var(--muns-border);
+  color: var(--muns-text);
   font-family: var(--font-ui); font-size: 0.68rem; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 4px 11px; border-radius: 20px;
@@ -467,7 +504,6 @@ body {
   font-family: var(--font-ui); font-size: 0.82rem; color: var(--text-muted);
 }
 
-/* Stats bar — fixed, does NOT scroll */
 .modelo-stats {
   display: flex; align-items: center;
   background: rgba(10, 30, 75, 0.7);
@@ -481,7 +517,6 @@ body {
 .ms-label { font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 3px; }
 .modelo-stat-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.1); margin: 0 16px; flex-shrink: 0; }
 
-/* 7 — Scroll wrapper: everything below stats scrolls here */
 .modelo-scroll-body {
   flex: 1;
   overflow-y: auto;
@@ -492,14 +527,12 @@ body {
 .modelo-scroll-body::-webkit-scrollbar-track { background: transparent; }
 .modelo-scroll-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
 
-/* Description */
 .modelo-description {
   font-family: var(--font-body); font-size: 0.93rem;
   line-height: 1.7; color: rgba(238, 242, 255, 0.78);
   padding: 18px 28px 0;
 }
 
-/* 2 — Link button inside modelo modal */
 .modelo-link-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   margin: 16px 28px 0; padding: 13px 20px;
@@ -510,7 +543,6 @@ body {
 }
 .modelo-link-btn:hover { background: rgba(79,142,247,0.2); transform: translateY(-1px); }
 
-/* Commissions section */
 .comisiones-section { padding: 20px 28px 28px; }
 
 .comisiones-section-header {
@@ -539,7 +571,6 @@ body {
   border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--radius-sm);
 }
 
-/* Commission accordion panels */
 .com-panel {
   background: var(--com-bg);
   border: 1px solid var(--com-border);
@@ -561,7 +592,6 @@ body {
 
 .com-panel-header:hover { background: rgba(79, 142, 247, 0.08); }
 
-/* Numbered circle */
 .com-number {
   display: flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
@@ -590,7 +620,6 @@ body {
 .com-chevron { color: var(--text-muted); transition: transform 0.24s cubic-bezier(0.4,0,0.2,1); display: flex; }
 .com-panel.open .com-chevron { transform: rotate(180deg); }
 
-/* Commission body (collapsible) */
 .com-panel-body {
   display: none; padding: 0 16px 16px;
   border-top: 1px solid rgba(79,142,247,0.15);
@@ -610,7 +639,6 @@ body {
   padding-left: 10px; border-left: 2px solid rgba(79,142,247,0.25);
 }
 
-/* Mesa directiva grid */
 .mesa-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px; margin-top: 12px;
@@ -631,7 +659,6 @@ body {
   padding: 3px 9px; border-radius: 20px; margin-bottom: 6px;
 }
 
-/* Role-specific badge colors */
 .role-director           { background: rgba(212,168,67,0.2);  border: 1px solid rgba(212,168,67,0.4);  color: var(--gold); }
 .role-director-adjunto   { background: rgba(79,142,247,0.18); border: 1px solid rgba(79,142,247,0.35); color: #93c5fd; }
 .role-evaluacion-control { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.32); color: #fcd34d; }
@@ -665,7 +692,7 @@ body {
   padding: 20px 26px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
 }
 .admin-header-left { display: flex; align-items: center; gap: 14px; }
-.admin-logo { font-size: 1.4rem; display: flex; align-items: center; color: var(--modelo-text); }
+.admin-logo { font-size: 1.4rem; display: flex; align-items: center; color: var(--muns-text); }
 .admin-logo i[data-lucide] { width: 1.4rem; height: 1.4rem; }
 .admin-title { font-family: var(--font-ui); font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
 .admin-subtitle { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
@@ -678,14 +705,13 @@ body {
 }
 .admin-close-btn:hover { background: rgba(255,255,255,0.14); transform: rotate(90deg); }
 
-/* 5 — Auth gate */
 .admin-auth { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
 .admin-auth-inner { text-align: center; max-width: 340px; }
 .admin-lock-icon {
   display: flex; align-items: center; justify-content: center;
   width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px;
-  background: rgba(255, 100, 88, 0.12); border: 1px solid rgba(255, 100, 88, 0.25);
-  color: var(--modelo-text);
+  background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--muns-text);
 }
 .admin-lock-icon i[data-lucide] { width: 2rem; height: 2rem; }
 .admin-auth-inner h3 { font-family: var(--font-ui); font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
@@ -723,7 +749,6 @@ select.admin-input  { cursor: pointer; }
 .admin-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 .admin-tab.active { color: #93c5fd; border-bottom-color: #4f8ef7; background: rgba(79,142,247,0.08); }
 
-/* 7 — Admin content area: flex so pane fills height */
 .admin-content {
   flex: 1;
   overflow: hidden;
@@ -732,7 +757,6 @@ select.admin-input  { cursor: pointer; }
   min-height: 0;
 }
 
-/* 7 — Admin tab pane: toolbar+form fixed, table scrolls inside */
 .admin-tab-pane {
   display: none;
   flex-direction: column;
@@ -761,7 +785,6 @@ select.admin-input  { cursor: pointer; }
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-md); padding: 18px; margin-bottom: 14px;
   flex-shrink: 0; animation: glassIn 0.2s ease;
-  /* 7 — form itself scrolls if very long on small screens */
   max-height: 45vh; overflow-y: auto; overscroll-behavior: contain;
 }
 .admin-form::-webkit-scrollbar { width: 4px; }
@@ -774,7 +797,6 @@ select.admin-input  { cursor: pointer; }
 .form-field label { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .form-actions { display: flex; gap: 10px; }
 
-/* 7 — Table wrap: scrolls vertically, table header stays sticky */
 .admin-table-wrap {
   flex: 1;
   overflow-y: auto;
@@ -813,7 +835,6 @@ select.admin-input  { cursor: pointer; }
   color: #93c5fd; padding: 2px 8px; border-radius: 20px;
 }
 
-/* Role chip in admin table */
 .role-chip {
   display: inline-block; font-family: var(--font-ui); font-size: 0.68rem; font-weight: 700;
   padding: 2px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;
@@ -840,52 +861,20 @@ select.admin-input  { cursor: pointer; }
 .scroll-top-btn:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
 
 /* ══════════════════════════════════════════════════════════
-   IMPROVEMENT 1 — Aviso highlight (pulse + glow + badge)
+   Aviso highlight — YELLOW (pulse + glow + badge)
 ══════════════════════════════════════════════════════════ */
 .day-cell.is-aviso {
-  /* Permanent hover-like brightness — looks "always hovered" */
-  filter: brightness(1.25) saturate(1.15);
-  animation: avisoPulse 2.2s ease-in-out infinite;
+  box-shadow: 0 0 0 1.5px rgba(234, 179, 8, 0.5);
   position: relative;
   z-index: 2;
 }
-.day-cell.is-aviso::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: inherit;
-  background: rgba(236, 72, 153, 0.18);
-  pointer-events: none;
-  z-index: -1;
-}
-@keyframes avisoPulse {
-  0%, 100% {
-    filter: brightness(1.2) saturate(1.1);
-    box-shadow: 0 0 0 2px #ec4899, 0 0 10px rgba(236,72,153,.4);
-  }
-  50% {
-    filter: brightness(1.38) saturate(1.25);
-    box-shadow: 0 0 0 3px #f472b6, 0 0 26px rgba(236,72,153,.72);
-  }
-}
 .upcoming-card.is-aviso {
-  border-color: rgba(236, 72, 153, 0.6) !important;
-  box-shadow: 0 0 0 1px rgba(236,72,153,0.35), 0 6px 22px rgba(0,0,0,.32), var(--glass-shine) !important;
+  border-color: rgba(234, 179, 8, 0.35) !important;
   position: relative;
-}
-.upcoming-card.is-aviso::before {
-  content: "Aviso";
-  position: absolute;
-  top: -10px; right: 12px;
-  font-family: var(--font-ui); font-size: 0.6rem; font-weight: 800;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  background: #ec4899; color: #fff;
-  padding: 2px 8px; border-radius: 6px;
-  pointer-events: none;
 }
 
 /* ══════════════════════════════════════════════════════════
-   IMPROVEMENT 2 — Link "Acceder" button
+   Link "Acceder" button
 ══════════════════════════════════════════════════════════ */
 .link-access {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -904,11 +893,10 @@ select.admin-input  { cursor: pointer; }
 .link-chip { text-decoration: none; font-size: .72rem !important; }
 
 /* ══════════════════════════════════════════════════════════
-   IMPROVEMENT 3 — Multi-event: secondary event colored dots
+   Multi-event: secondary event colored dots
 ══════════════════════════════════════════════════════════ */
 .day-cell.multi-event { position: relative; }
 
-/* Container for secondary event dots (shown below the day number) */
 .sec-dots {
   display: flex;
   justify-content: center;
@@ -917,7 +905,6 @@ select.admin-input  { cursor: pointer; }
   margin-top: 2px;
   line-height: 1;
 }
-/* Each dot matches the secondary event's type color */
 .sec-dot {
   display: inline-block;
   width: 5px; height: 5px;
@@ -925,15 +912,19 @@ select.admin-input  { cursor: pointer; }
   flex-shrink: 0;
   box-shadow: 0 0 3px rgba(0,0,0,0.4);
 }
-.sec-actividad { background: #3b82f6; }
-.sec-visita    { background: #22c55e; }
-.sec-reunion   { background: #a855f7; }
-.sec-evento    { background: #f59e0b; }
-.sec-feriado   { background: #ef4444; }
-.sec-modelo    { background: #ff6458; }
+.sec-actividad  { background: var(--c-actividad); }
+.sec-visita     { background: var(--c-visita); }
+.sec-reunion    { background: var(--c-reunion); }
+.sec-evento     { background: var(--c-evento); }
+.sec-muns       { background: var(--c-muns); }
+.sec-aviso      { background: var(--c-aviso); }
+.sec-efemerides { background: var(--c-efemerides); }
+/* Legacy */
+.sec-feriado    { background: var(--c-efemerides); }
+.sec-modelo     { background: var(--c-muns); }
 
 /* ══════════════════════════════════════════════════════════
-   IMPROVEMENT 4 — Event chooser (any type, not just modelos)
+   Event chooser
 ══════════════════════════════════════════════════════════ */
 .chooser-card {
   background: rgba(10, 26, 56, 0.92);
@@ -942,7 +933,6 @@ select.admin-input  { cursor: pointer; }
   box-shadow: 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.22);
   border-radius: var(--radius-lg); padding: 28px 26px;
   width: 100%; max-width: 420px; position: relative;
-  /* 7 — chooser scrolls if many events */
   max-height: 88vh; overflow-y: auto; overscroll-behavior: contain;
   animation: glassIn 0.26s cubic-bezier(0.34,1.4,0.64,1);
 }
@@ -961,7 +951,6 @@ select.admin-input  { cursor: pointer; }
 }
 .chooser-list { display: flex; flex-direction: column; gap: 10px; }
 
-/* Base chooser item — neutral */
 .chooser-item {
   display: flex; align-items: center; gap: 14px;
   background: var(--glass-bg); border: 1px solid var(--glass-border);
@@ -970,34 +959,40 @@ select.admin-input  { cursor: pointer; }
 }
 .chooser-item:hover { transform: translateY(-1px); filter: brightness(1.15); }
 
-/* Type-specific item colors */
-.chooser-item.tag-modelo  { background: var(--modelo-bg); border-color: var(--modelo-border); }
+.chooser-item.tag-muns      { background: var(--muns-bg); border-color: var(--muns-border); }
 .chooser-item.tag-actividad { background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.3); }
 .chooser-item.tag-visita    { background: rgba(34,197,94,0.14);  border-color: rgba(34,197,94,0.3); }
-.chooser-item.tag-reunion   { background: rgba(168,85,247,0.14); border-color: rgba(168,85,247,0.3); }
-.chooser-item.tag-evento    { background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.3); }
-.chooser-item.tag-feriado   { background: rgba(239,68,68,0.14);  border-color: rgba(239,68,68,0.3); }
+.chooser-item.tag-reunion   { background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.3); }
+.chooser-item.tag-evento    { background: rgba(249,115,22,0.14); border-color: rgba(249,115,22,0.3); }
+.chooser-item.tag-efemerides{ background: rgba(55,65,81,0.30);   border-color: rgba(55,65,81,0.5); }
+.chooser-item.tag-aviso     { background: rgba(234,179,8,0.14);  border-color: rgba(234,179,8,0.3); }
+/* Legacy */
+.chooser-item.tag-feriado   { background: rgba(55,65,81,0.30);   border-color: rgba(55,65,81,0.5); }
+.chooser-item.tag-modelo    { background: var(--muns-bg); border-color: var(--muns-border); }
 
-/* Chooser icon circle */
 .chooser-icon {
   display: flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(255,255,255,0.2);
   background: rgba(255,255,255,0.08); color: var(--text);
 }
-.chooser-icon.tag-modelo    { background: rgba(255,100,88,0.2);  color: var(--modelo-text); border-color: rgba(255,100,88,0.3); }
-.chooser-icon.tag-actividad { background: rgba(59,130,246,0.2);  color: #93c5fd;             border-color: rgba(59,130,246,0.3); }
-.chooser-icon.tag-visita    { background: rgba(34,197,94,0.2);   color: #86efac;             border-color: rgba(34,197,94,0.3); }
-.chooser-icon.tag-reunion   { background: rgba(168,85,247,0.2);  color: #d8b4fe;             border-color: rgba(168,85,247,0.3); }
-.chooser-icon.tag-evento    { background: rgba(245,158,11,0.2);  color: #fcd34d;             border-color: rgba(245,158,11,0.3); }
-.chooser-icon.tag-feriado   { background: rgba(239,68,68,0.2);   color: #fca5a5;             border-color: rgba(239,68,68,0.3); }
+.chooser-icon.tag-muns      { background: rgba(239,68,68,0.2);  color: var(--muns-text); border-color: rgba(239,68,68,0.3); }
+.chooser-icon.tag-actividad { background: rgba(59,130,246,0.2);  color: #93c5fd;          border-color: rgba(59,130,246,0.3); }
+.chooser-icon.tag-visita    { background: rgba(34,197,94,0.2);   color: #86efac;          border-color: rgba(34,197,94,0.3); }
+.chooser-icon.tag-reunion   { background: rgba(139,92,246,0.2);  color: #c4b5fd;          border-color: rgba(139,92,246,0.3); }
+.chooser-icon.tag-evento    { background: rgba(249,115,22,0.2);  color: #fdba74;          border-color: rgba(249,115,22,0.3); }
+.chooser-icon.tag-efemerides{ background: rgba(55,65,81,0.3);    color: #d1d5db;          border-color: rgba(55,65,81,0.5); }
+.chooser-icon.tag-aviso     { background: rgba(234,179,8,0.2);   color: #fde047;          border-color: rgba(234,179,8,0.3); }
+/* Legacy */
+.chooser-icon.tag-feriado   { background: rgba(55,65,81,0.3);    color: #d1d5db;          border-color: rgba(55,65,81,0.5); }
+.chooser-icon.tag-modelo    { background: rgba(239,68,68,0.2);   color: var(--muns-text);  border-color: rgba(239,68,68,0.3); }
 
 .chooser-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .chooser-text strong { font-family: var(--font-body); font-size: 0.95rem; color: var(--text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chooser-text small  { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-muted); }
 
 /* ══════════════════════════════════════════════════════════
-   IMPROVEMENT 5 — Shake animation for wrong password
+   Shake animation for wrong password
 ══════════════════════════════════════════════════════════ */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -1007,6 +1002,107 @@ select.admin-input  { cursor: pointer; }
   80%       { transform: translateX(6px); }
 }
 .admin-input.shake { animation: shake 0.5s ease; border-color: rgba(239,68,68,0.6) !important; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE UPCOMING ACCORDION — v4.0
+══════════════════════════════════════════════════════════════ */
+.mobile-upcoming-section {
+  display: none; /* hidden on desktop */
+  margin-bottom: 8px;
+}
+
+.upcoming-accordion-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 16px 18px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-shine);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-ui);
+  color: var(--text);
+}
+.upcoming-accordion-toggle:hover {
+  background: var(--glass-bg-hover);
+}
+.upcoming-accordion-toggle.is-open {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border-bottom-color: transparent;
+  box-shadow: var(--glass-shadow);
+}
+
+.accordion-toggle-left {
+  display: flex; align-items: center; gap: 12px;
+}
+.accordion-toggle-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(79, 142, 247, 0.15);
+  border: 1px solid rgba(79, 142, 247, 0.25);
+  color: #93c5fd; flex-shrink: 0;
+}
+.accordion-toggle-text {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+}
+.accordion-toggle-text strong {
+  font-size: 0.92rem; font-weight: 700; letter-spacing: -0.01em;
+}
+.accordion-toggle-text small {
+  font-size: 0.72rem; color: var(--text-muted); font-weight: 500;
+}
+.accordion-chevron {
+  display: flex; align-items: center; color: var(--text-muted);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.accordion-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.upcoming-accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: var(--glass-shadow);
+}
+.upcoming-accordion-body.is-open {
+  max-height: 600px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.upcoming-accordion-body::-webkit-scrollbar { width: 4px; }
+.upcoming-accordion-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+#mobileUpcoming {
+  padding: 8px 14px 14px;
+}
+#mobileUpcoming .upcoming-card {
+  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+#mobileUpcoming .upcoming-card:last-child {
+  margin-bottom: 0;
+}
+#mobileUpcoming .event-name {
+  font-size: 0.88rem;
+}
+
+/* Type tag pill for upcoming cards */
+.upcoming-type-pill {
+  display: inline-block;
+  font-family: var(--font-ui); font-size: 0.58rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 4px;
+}
+
 
 /* ================= BASE RESPONSIVE ================= */
 @media (max-width: 768px) {
@@ -1019,14 +1115,17 @@ select.admin-input  { cursor: pointer; }
   .controls  { display: none; }
 
   .layout { grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
-  .sidebar { order: 1; }
+
+  /* Hide desktop sidebar, show mobile sections */
+  .sidebar { display: none; }
+  .mobile-upcoming-section { display: block; order: -1; }
+  .mobile-legend { display: block; }
   #calendarArea { order: 2; }
 
   .day-cell   { padding: 7px 0; font-size: 0.77rem; }
   .day-header { font-size: 0.64rem; }
   .month-grid { gap: 4px; }
 
-  /* Modelo modal responsive */
   .modelo-modal-card { border-radius: var(--radius-md); max-height: 94vh; }
   .modelo-hero { padding: 20px 18px 16px; }
   .modelo-title { font-size: 1.15rem; }
@@ -1041,7 +1140,7 @@ select.admin-input  { cursor: pointer; }
   .scroll-top-btn { bottom: 18px; right: 18px; width: 40px; height: 40px; }
 }
 
-/* ── Admin panel — mobile sheet (slides up from bottom) ── */
+/* Admin panel — mobile sheet */
 @media (max-width: 700px) {
   .admin-overlay {
     padding: 0;
@@ -1061,47 +1160,35 @@ select.admin-input  { cursor: pointer; }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Header */
   .admin-header { padding: 16px 18px; }
   .admin-title  { font-size: 0.98rem; }
   .admin-subtitle { font-size: 0.7rem; }
 
-  /* Tabs */
   .admin-tabs { padding: 10px 14px 0; gap: 2px; }
   .admin-tab  { padding: 9px 10px; font-size: 0.76rem; gap: 4px; }
 
-  /* Tab content */
   .admin-tab-pane { padding: 14px 14px 16px; }
 
-  /* Toolbar */
   .tab-toolbar { gap: 8px; }
   .tab-title    { font-size: 0.9rem; }
 
-  /* Forms */
   .admin-form   { padding: 14px; max-height: 40vh; }
   .form-grid    { grid-template-columns: 1fr; }
   .form-actions { flex-wrap: wrap; }
   .form-actions .btn { flex: 1; min-width: 0; justify-content: center; }
 
-  /* Tables: min-width to allow horizontal scroll */
   .admin-table { min-width: 480px; }
   .admin-table thead th { padding: 8px 10px; font-size: 0.62rem; }
   .admin-table td { padding: 8px 10px; font-size: 0.8rem; }
   .action-btns { gap: 4px; }
   .action-btns .btn { padding: 5px 8px; }
 
-  /* Auth */
   .admin-auth { padding: 28px 16px; }
   .admin-auth-form { flex-direction: column; gap: 8px; }
   .admin-auth-form .btn { width: 100%; justify-content: center; }
 
-  /* Chooser */
   .chooser-card { padding: 22px 18px; max-height: 90dvh; max-height: 90vh; }
 }
-
-/* ══════════════════════════════════════════════════════════
-   IMPROVEMENT 8 — Enhanced responsive breakpoints
-══════════════════════════════════════════════════════════ */
 
 /* Tablet: switch to single column */
 @media (max-width: 900px) {
@@ -1117,7 +1204,6 @@ select.admin-input  { cursor: pointer; }
 }
 
 @media (max-width: 600px) {
-  /* Modals fill more screen */
   .modal { padding: 10px; }
   .modal-card { padding: 18px; max-height: 92vh; border-radius: var(--radius-md); }
   .chooser-card { padding: 20px 16px; max-height: 88vh; }
@@ -1132,19 +1218,15 @@ select.admin-input  { cursor: pointer; }
   .modelo-link-btn { margin: 12px 16px 0; }
   .modelo-description { padding: 14px 16px 0; }
 
-  /* Calendar cells */
   .day-cell { padding: 6px 0; font-size: 0.76rem; border-radius: 8px; }
   .month-card { padding: 12px 10px; }
   .month-grid { gap: 3px; }
 
-  /* Upcoming cards */
   .upcoming-card { padding: 12px 14px; }
   .event-name { font-size: 0.88rem; }
 
-  /* Legend */
   .legend-items { gap: 8px 14px; }
 
-  /* Chooser items */
   .chooser-item { padding: 12px 14px; gap: 12px; }
   .chooser-icon { width: 32px; height: 32px; }
   .chooser-text strong { font-size: 0.88rem; }

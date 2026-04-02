@@ -1,6 +1,6 @@
 // ================================================================
-//  CELIDER-08 Calendar — Frontend App  v3.1
-//  All 8 improvements fully implemented
+//  CELIDER-08 Calendar — Frontend App  v4.0
+//  Updated: color system, Efemérides/MUNs, mobile accordion
 // ================================================================
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGfYotCId_Ip4D1wXi2wVL-jNWmmlBwSjdnbs80FyLia62xmixbiMyEIBDV1wNuI26gg/exec";
@@ -28,17 +28,26 @@ const ICON = {
 
 // SVG icons per event type (for the chooser)
 const TYPE_ICONS = {
-  modelo:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 22V12a9 9 0 0118 0v10"/><path d="M9 22V12h6v10"/></svg>`,
-  actividad: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-  visita:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
-  reunion:   `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`,
-  evento:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
-  feriado:   `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+  muns:       `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 22V12a9 9 0 0118 0v10"/><path d="M9 22V12h6v10"/></svg>`,
+  actividad:  `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  visita:     `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  reunion:    `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`,
+  evento:     `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  efemerides: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+  aviso:      `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>`,
 };
 const TYPE_LABELS = {
-  modelo: "Modelo Distrital", actividad: "Actividad", visita: "Visita",
-  reunion: "Reunión", evento: "Evento", feriado: "Feriado"
+  muns: "MUNs", actividad: "Actividad", visita: "Visita",
+  reunion: "Reunión", evento: "Evento", efemerides: "Efemérides", aviso: "Aviso"
 };
+
+// Normalize legacy type names from existing data
+function normalizeType(rawType) {
+  const t = (rawType || "evento").toLowerCase().trim();
+  if (t === "feriado") return "efemerides";
+  if (t === "modelo")  return "muns";
+  return t;
+}
 
 const calendarArea = qs("#calendarArea");
 const upcomingEl   = qs("#upcoming");
@@ -59,6 +68,14 @@ const menuOverlay  = qs("#menuOverlay");
 const mobileMenu   = qs("#mobileMenu");
 const menuClose    = qs("#menuClose");
 
+// Mobile accordion elements
+const mobileUpcomingSection = qs("#mobileUpcomingSection");
+const upcomingAccordionToggle = qs("#upcomingAccordionToggle");
+const upcomingAccordionBody = qs("#upcomingAccordionBody");
+const accordionChevron = qs("#accordionChevron");
+const mobileUpcomingEl = qs("#mobileUpcoming");
+const upcomingCount = qs("#upcomingCount");
+
 function openMenu()  {
   hamburgerBtn.classList.add("is-open");
   menuOverlay.classList.add("is-open");
@@ -77,6 +94,22 @@ menuClose.addEventListener("click", closeMenu);
 menuOverlay.addEventListener("click", closeMenu);
 qs("#refreshBtnMobile").addEventListener("click", () => { closeMenu(); setTimeout(() => location.reload(), 200); });
 
+// Mobile accordion toggle
+upcomingAccordionToggle.addEventListener("click", () => {
+  const isOpen = upcomingAccordionBody.classList.contains("is-open");
+  if (isOpen) {
+    upcomingAccordionBody.classList.remove("is-open");
+    upcomingAccordionToggle.classList.remove("is-open");
+    accordionChevron.classList.remove("is-open");
+    upcomingAccordionToggle.setAttribute("aria-expanded", "false");
+  } else {
+    upcomingAccordionBody.classList.add("is-open");
+    upcomingAccordionToggle.classList.add("is-open");
+    accordionChevron.classList.add("is-open");
+    upcomingAccordionToggle.setAttribute("aria-expanded", "true");
+  }
+});
+
 function parseDate(str) {
   if (!str || str.trim() === "") return null;
   const [y, m, d] = str.trim().split("-").map(Number);
@@ -92,7 +125,6 @@ function dateRangeLabel(ev) {
   return `${start} – ${ev._dateEnd.toLocaleDateString("es-ES", opts)}`;
 }
 
-// Helper: parse aviso from Google Sheets (may be boolean TRUE or string "TRUE")
 function parseBoolean(val) {
   if (typeof val === "boolean") return val;
   if (typeof val === "string")  return val.trim().toUpperCase() === "TRUE";
@@ -105,14 +137,16 @@ function processEvents(rawData) {
     if (!dateStart) return null;
     const dateEnd = parseDate(r.date_end) || new Date(dateStart);
     const days    = Math.round((dateEnd - dateStart) / 86400000) + 1;
+    const normalizedType = normalizeType(r.type);
     return {
       id: r.id || "", date: r.date || "", date_end: r.date_end || "",
       title: r.title || "", description: r.description || "",
       image: r.image || "", pictures: r.pictures || "", link: r.link || "",
-      type: (r.type || "evento").toLowerCase().trim(),
+      type: normalizedType,
+      // Keep raw type for saving back (backward compat)
+      _rawType: (r.type || "evento").toLowerCase().trim(),
       modelo_ref: r.modelo_ref || "",
-      // FIX 1: handle boolean or string "TRUE" from Google Sheets
-      aviso: parseBoolean(r.aviso),
+      aviso: parseBoolean(r.aviso) || normalizedType === "aviso",
       _dateStart: dateStart, _dateEnd: dateEnd, _days: days
     };
   }).filter(Boolean).filter(e => e.title);
@@ -140,12 +174,10 @@ async function loadAllData() {
   }
 }
 
-// FIX 3: Build day map with ARRAYS to support multiple events per day
 function buildDayMap() {
   const map = {};
   function addToMap(key, ev, position) {
     if (!map[key]) map[key] = [];
-    // Dedup by object reference — NOT by id (ids may be empty or reused)
     if (!map[key].find(e => e.ev === ev)) map[key].push({ ev, position });
   }
   EVENTS.forEach(ev => {
@@ -202,16 +234,14 @@ function renderCalendar() {
       if (entries && entries.length > 0) {
         const { ev: primaryEv, position } = entries[0];
         cell.classList.add("has-event", `tag-${primaryEv.type}`, `range-${position}`);
-        // Apply aviso if ANY event on this day has aviso=true (not just primary)
-        if (entries.some(e => e.ev.aviso)) cell.classList.add("is-aviso");
-        // Multi-event marker
+        // Apply aviso if ANY event on this day has aviso=true or is type aviso
+        if (entries.some(e => e.ev.aviso || e.ev.type === "aviso")) cell.classList.add("is-aviso");
         if (entries.length > 1) cell.classList.add("multi-event");
 
         cell.innerHTML = `<span>${d}</span>`;
         if (position === "start" && primaryEv._days > 1)
           cell.innerHTML += `<span class="range-badge">${primaryEv._days}d</span>`;
 
-        // Show colored dots for every secondary event so user sees all events on this day
         if (entries.length > 1) {
           const secDots = entries.slice(1)
             .map(({ ev }) => `<span class="sec-dot sec-${ev.type}"></span>`)
@@ -229,7 +259,6 @@ function renderCalendar() {
     monthSections.push({ section, isPast, isCurrent });
   }
 
-  // Future and current months first, past months at the bottom
   monthSections.filter(ms => !ms.isPast).forEach(ms => calendarArea.appendChild(ms.section));
   const past = monthSections.filter(ms => ms.isPast);
   if (past.length > 0) {
@@ -252,26 +281,22 @@ function renderCalendar() {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  FIX 3 + 4: Smart day event routing — chooser for ANY multi-event day
+//  Smart day event routing
 // ─────────────────────────────────────────────────────────────
 function openDayEvents(entries) {
-  // Single event: open directly
   if (entries.length === 1) { openEventModal(entries[0].ev); return; }
-  // Multiple events of any type → show the chooser
   openEventChooser(entries);
 }
 
-// FIX 4: General event chooser (works for modelos AND mixed/regular events)
 function openEventChooser(entries) {
   const chooser  = qs("#modeloChooser");
   const list     = qs("#modeloChooserList");
   const subtitle = qs("#modeloChooserSubtitle");
 
-  // Update subtitle to reflect content
-  const allModelos = entries.every(e => e.ev.type === "modelo");
+  const allMuns = entries.every(e => e.ev.type === "muns");
   if (subtitle) {
-    subtitle.textContent = allModelos
-      ? "Hay varios modelos en este día. ¿Cuál deseas ver?"
+    subtitle.textContent = allMuns
+      ? "Hay varios MUNs en este día. ¿Cuál deseas ver?"
       : "Hay varios eventos en este día. ¿Cuál deseas ver?";
   }
 
@@ -299,7 +324,6 @@ function openEventChooser(entries) {
   document.body.style.overflow = "hidden";
 }
 
-// Close chooser on backdrop click or X button
 qs("#modeloChooser").addEventListener("click", e => {
   if (e.target === qs("#modeloChooser")) {
     qs("#modeloChooser").classList.remove("open");
@@ -311,9 +335,10 @@ qs("#modeloChooserClose").onclick = () => {
   document.body.style.overflow = "";
 };
 
-// FIX 3: Upcoming shows ALL unique upcoming events (no duplicates by ID)
 function renderUpcoming() {
   upcomingEl.innerHTML = "";
+  if (mobileUpcomingEl) mobileUpcomingEl.innerHTML = "";
+
   const today = new Date(); today.setHours(0,0,0,0);
   const seen = new Set();
   const upcoming = EVENTS
@@ -322,35 +347,57 @@ function renderUpcoming() {
     .filter(ev => { if (seen.has(ev.id)) return false; seen.add(ev.id); return true; })
     .slice(0, 10);
 
+  // Update mobile accordion count
+  if (upcomingCount) {
+    upcomingCount.textContent = upcoming.length > 0
+      ? `${upcoming.length} evento${upcoming.length !== 1 ? "s" : ""} próximos`
+      : "Sin eventos próximos";
+  }
+
   if (upcoming.length === 0) {
-    upcomingEl.innerHTML = `<p style="opacity:.45;font-size:.88rem;font-family:var(--font-body)">No hay próximos eventos.</p>`;
+    const emptyHtml = `<p style="opacity:.45;font-size:.88rem;font-family:var(--font-body)">No hay próximos eventos.</p>`;
+    upcomingEl.innerHTML = emptyHtml;
+    if (mobileUpcomingEl) mobileUpcomingEl.innerHTML = emptyHtml;
     return;
   }
+
   upcoming.forEach(ev => {
-    const card = document.createElement("div");
-    card.className = `upcoming-card tag-${ev.type}`;
-    // FIX 1: aviso highlight in upcoming
-    if (ev.aviso) card.classList.add("is-aviso");
-    const durHtml  = ev._days > 1 ? `<span class="duration-pill">${ev._days} días</span>` : "";
-    const typeIcon = ev.type === "modelo" ? `<span class="upcoming-mun-badge">MUN</span>` : "";
-    card.innerHTML = `
-      <div style="min-width:0;flex:1">
-        <strong class="event-name">${ev.title}</strong>
-        <div class="upcoming-meta">
-          <span class="event-date">${dateRangeLabel(ev)}</span>
-          ${durHtml}${typeIcon}
-        </div>
-      </div>`;
-    card.onclick = () => openEventModal(ev);
+    // Build card for desktop sidebar
+    const card = buildUpcomingCard(ev);
     upcomingEl.appendChild(card);
+
+    // Build card for mobile accordion
+    if (mobileUpcomingEl) {
+      const mobileCard = buildUpcomingCard(ev);
+      mobileUpcomingEl.appendChild(mobileCard);
+    }
   });
+}
+
+function buildUpcomingCard(ev) {
+  const card = document.createElement("div");
+  card.className = `upcoming-card tag-${ev.type}`;
+  if (ev.aviso || ev.type === "aviso") card.classList.add("is-aviso");
+  const durHtml  = ev._days > 1 ? `<span class="duration-pill">${ev._days} días</span>` : "";
+  const typeIcon = ev.type === "muns" ? `<span class="upcoming-mun-badge">MUN</span>` : "";
+  card.innerHTML = `
+    <div style="min-width:0;flex:1">
+      <strong class="event-name">${ev.title}</strong>
+      <div class="upcoming-meta">
+        <span class="event-date">${dateRangeLabel(ev)}</span>
+        ${durHtml}${typeIcon}
+      </div>
+    </div>`;
+  card.onclick = () => openEventModal(ev);
+  return card;
 }
 
 // ─────────────────────────────────────────────────────────────
 //  Event modal router
 // ─────────────────────────────────────────────────────────────
 function openEventModal(ev) {
-  if (ev.type === "modelo") { openModeloModal(ev); return; }
+  // MUNs (formerly modelo) uses special modal
+  if (ev.type === "muns") { openModeloModal(ev); return; }
 
   modalTitle.textContent = ev.title;
   modalDate.textContent  = ev._days > 1
@@ -358,7 +405,6 @@ function openEventModal(ev) {
     : formatDateDisplay(ev.date);
   modalDesc.textContent  = ev.description;
 
-  // FIX 6: cover image always visible if present
   if (ev.image) {
     modalImg.src = ev.image;
     modalImg.style.display = "block";
@@ -368,11 +414,9 @@ function openEventModal(ev) {
     modalImg.src = "";
   }
 
-  // Photos button
   modalPicsBtn.href          = ev.pictures || "#";
   modalPicsBtn.style.display = ev.pictures ? "flex" : "none";
 
-  // FIX 2: link button below pics button
   const existingLink = qs("#modalLinkBtn");
   if (existingLink) existingLink.remove();
   if (ev.link) {
@@ -391,11 +435,10 @@ function openEventModal(ev) {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  Modelo Distrital modal
+//  Modelo Distrital (MUNs) modal
 // ─────────────────────────────────────────────────────────────
 function openModeloModal(ev) {
   const meta = MODELOS.find(m => m.id === ev.modelo_ref) || {};
-  // FIX 6: ev.image takes priority, then modelo metadata image
   const image   = ev.image || meta.image || "";
   const edition = meta.edition || "";
 
@@ -417,7 +460,6 @@ function openModeloModal(ev) {
       if (!isOpen) panel.classList.add("open");
     });
   });
-  // Auto-open first commission
   const first = card.querySelector(".com-panel");
   if (first) first.classList.add("open");
 
@@ -437,12 +479,10 @@ function buildModeloModalContent(ev, meta, asignaciones, totalMiembros) {
     ${ev._days > 1 ? `<div class="modelo-stat-divider"></div><div class="modelo-stat"><span class="ms-value">${ev._days}</span><span class="ms-label">Días</span></div>` : ""}
   </div>`;
 
-  // FIX 6: banner image always shown if URL exists, with onerror fallback
   const imageHtml = meta.image
     ? `<img src="${meta.image}" class="modelo-banner-img" alt="${ev.title}" loading="lazy" onerror="this.style.display='none'">`
     : "";
 
-  // FIX 2: link button inside scroll body
   const linkBtnHtml = ev.link
     ? `<a class="modelo-link-btn" href="${ev.link}" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -452,7 +492,6 @@ function buildModeloModalContent(ev, meta, asignaciones, totalMiembros) {
 
   const comisionesHtml = buildComisionesHtml(ev, asignaciones);
 
-  // FIX 7: hero + stats are fixed (flex-shrink:0), everything else in .modelo-scroll-body scrolls
   return `
     <button class="modal-close">${ICON.close}</button>
     <div class="modelo-hero">
@@ -461,7 +500,7 @@ function buildModeloModalContent(ev, meta, asignaciones, totalMiembros) {
         <div class="modelo-hero-top">
           <span class="modelo-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 22V12a9 9 0 0118 0v10"/><path d="M9 22V12h6v10"/></svg>
-            Modelo de las Naciones Unidas· MUN
+            Modelo de las Naciones Unidas · MUN
           </span>
           ${meta.edition ? `<span class="modelo-edition-pill">${meta.edition}</span>` : ""}
         </div>
@@ -598,14 +637,12 @@ qs(".admin-tabs").addEventListener("click", e => {
   if (window.lucide) lucide.createIcons();
 });
 
-// FIX 5: Block admin content on wrong password + shake animation
 const ADMIN_PASSWORD = "celider08admin";
 
 async function adminLogin() {
   const pass = adminPassInput.value.trim();
   if (!pass) { adminAuthError.textContent = "Ingresa la contraseña."; return; }
 
-  // Client-side gate — reject immediately without hitting the server
   if (pass !== ADMIN_PASSWORD) {
     adminAuthError.textContent = "⛔ Acceso denegado. Contraseña incorrecta.";
     adminPassInput.value = "";
@@ -636,7 +673,6 @@ async function adminLogin() {
     } else if (res.error) {
       adminAuthError.textContent = `Error: ${res.error}`;
     } else {
-      // Success
       adminPassword      = pass;
       adminAuthenticated = true;
       EVENTS            = processEvents(res.calendar      || []);
@@ -688,11 +724,11 @@ function refreshAdminData() {
 }
 
 function populateAdminSelects() {
-  const modeloEvents = EVENTS.filter(e => e.type === "modelo");
+  const modeloEvents = EVENTS.filter(e => e.type === "muns");
   ["cf-modelo_ref","asf-evento_id","mdf-evento_id"].forEach(id => {
     const sel = qs(`#${id}`); if (!sel) return;
     const cur = sel.value;
-    sel.innerHTML = `<option value="">— Seleccionar evento modelo —</option>`;
+    sel.innerHTML = `<option value="">— Seleccionar evento MUNs —</option>`;
     modeloEvents.forEach(ev => { const opt = document.createElement("option"); opt.value = ev.id; opt.textContent = `${ev.title} (${ev.date})`; sel.appendChild(opt); });
     if (cur) sel.value = cur;
   });
@@ -705,7 +741,6 @@ function populateAdminSelects() {
   });
 }
 
-// FIX 2: Calendar table with link column
 function renderCalendarTable() {
   const tbody = qs("#calendarTbody");
   tbody.innerHTML = "";
@@ -715,10 +750,11 @@ function renderCalendarTable() {
   }
   EVENTS.sort((a,b) => a._dateStart - b._dateStart).forEach(ev => {
     const tr = document.createElement("tr");
+    const typeLabel = TYPE_LABELS[ev.type] || ev.type;
     tr.innerHTML = `
       <td>${ev.date}${ev.date_end ? ` → ${ev.date_end}` : ""}</td>
       <td>${ev.title}</td>
-      <td><span class="type-chip tag-${ev.type}">${ev.type}</span></td>
+      <td><span class="type-chip tag-${ev.type}">${typeLabel}</span></td>
       <td>
         ${ev.pictures
           ? `<a href="${ev.pictures}" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#86efac;margin-bottom:4px">
@@ -748,14 +784,18 @@ qs("#addCalendarBtn").onclick = () => {
   qs("#cf-modelo-ref-field").style.display = "none";
   toggleForm("calendarForm", true);
 };
-qs("#cf-type").onchange = () => { qs("#cf-modelo-ref-field").style.display = qs("#cf-type").value === "modelo" ? "block" : "none"; };
+qs("#cf-type").onchange = () => { qs("#cf-modelo-ref-field").style.display = qs("#cf-type").value === "muns" ? "block" : "none"; };
 qs("#cancelCalendarBtn").onclick = () => toggleForm("calendarForm", false);
 qs("#saveCalendarBtn").onclick = async () => {
+  const typeVal = qs("#cf-type").value;
   const data = {
     id: qs("#cf-id").value, date: qs("#cf-date").value, date_end: qs("#cf-date_end").value,
     title: qs("#cf-title").value.trim(), description: qs("#cf-description").value.trim(),
     image: qs("#cf-image").value.trim(), pictures: qs("#cf-pictures").value.trim(),
-    link: qs("#cf-link").value.trim(), type: qs("#cf-type").value, modelo_ref: qs("#cf-modelo_ref").value
+    link: qs("#cf-link").value.trim(),
+    // Save with the new type names; backend stores as-is
+    type: typeVal,
+    modelo_ref: qs("#cf-modelo_ref").value
   };
   if (!data.date || !data.title) { alert("Fecha y título son requeridos."); return; }
   qs("#saveCalendarBtn").textContent = "Guardando…";
@@ -772,7 +812,7 @@ function editCalendarEvent(id) {
   qs("#cf-image").value = ev.image; qs("#cf-pictures").value = ev.pictures;
   qs("#cf-link").value = ev.link || "";
   qs("#cf-type").value = ev.type; qs("#cf-modelo_ref").value = ev.modelo_ref;
-  qs("#cf-modelo-ref-field").style.display = ev.type === "modelo" ? "block" : "none";
+  qs("#cf-modelo-ref-field").style.display = ev.type === "muns" ? "block" : "none";
   toggleForm("calendarForm", true);
 }
 async function deleteCalendarEvent(id) {
