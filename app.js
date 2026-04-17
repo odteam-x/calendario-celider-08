@@ -344,7 +344,12 @@ function renderUpcoming() {
   const upcoming = EVENTS
     .filter(ev => ev._dateEnd >= today)
     .sort((a, b) => a._dateStart - b._dateStart)
-    .filter(ev => { if (seen.has(ev.id)) return false; seen.add(ev.id); return true; })
+    .filter(ev => {
+      const key = ev.id ? ev.id : `${ev.date}|${ev.title}|${ev.type}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .slice(0, 10);
 
   // Update mobile accordion count
@@ -372,6 +377,14 @@ function renderUpcoming() {
       mobileUpcomingEl.appendChild(mobileCard);
     }
   });
+
+  // Auto-expand mobile accordion on first load
+  if (mobileUpcomingEl && upcoming.length > 0) {
+    upcomingAccordionBody.classList.add("is-open");
+    upcomingAccordionToggle.classList.add("is-open");
+    accordionChevron.classList.add("is-open");
+    upcomingAccordionToggle.setAttribute("aria-expanded", "true");
+  }
 }
 
 function buildUpcomingCard(ev) {
