@@ -1,32 +1,108 @@
 // ================================================================
-//  CELIDER-08 Calendar — Google Apps Script Backend  v2.1
+//  CELIDER-08 Calendar — Google Apps Script Backend  v3.1 (hardened)
 //  Spreadsheet: https://docs.google.com/spreadsheets/d/...
 //
-//  SETUP (run once):
-//    1. Extensions → Apps Script → paste this as Code.gs
-//    2. Run  initSheets()  once to create all required sheets
-//    3. Set admin password:
-//         Project Settings → Script Properties
-//         Key: ADMIN_PASS   Value: <your-password>
-//    4. Deploy → New deployment → Web app
+//  INSTALACIÓN ONE-SHOT:
+//    1. Extensions → Apps Script → pega este archivo entero como Code.gs
+//    2. (Solo la primera vez) Run → initSheets()
+//    3. Deploy → New deployment → Web app
 //         Execute as: Me   |   Who has access: Anyone
-//    5. Copy deployment URL → app.js → APPS_SCRIPT_URL
+//    4. Copia la URL de deployment → pégala en app.js → APPS_SCRIPT_URL
+//    5. Manage deployments → Archive de deployments anteriores
+//       (invalida URLs viejas que se hayan filtrado)
 //
-//  SCHEMA  (v2.1):
-//    calendar          — all events (type="modelo" triggers special logic)
-//    modelos           — optional metadata for MUN events (image, edition…)
-//    comisiones        — GLOBAL reusable commission catalogue (includes topico fijo)
-//    modelo_comisiones — junction: which commissions belong to which event
-//    mesas_directivas  — directiva members (per event × commission)
+//  CONTRASEÑA:
+//    - La contraseña vive como SHA-256 en la constante DEFAULT_PASS_HASH.
+//    - Para cambiarla:
+//        Opción A (rápida): edita la constante con el nuevo hash y redeploy.
+//        Opción B (sin tocar código): Project Settings → Script Properties →
+//          añade ADMIN_PASS_HASH = <nuevo hash>. Tiene prioridad sobre la constante.
+//    - Para generar un hash desde el editor:  sha256Hex("tu-clave-nueva")
 //
-//  IDs: simple auto-increment integers (1, 2, 3…) — fully editable in Sheets
+//  SECURITY MODEL:
+//    - La contraseña en texto plano NO existe en ningún archivo (ni cliente ni servidor).
+//    - Login por POST (action=login) → el server devuelve un token aleatorio
+//      con TTL de 30 min en CacheService.
+//    - Acciones admin (addRow / updateRow / deleteRow) SOLO aceptan POST con token.
+//      La contraseña nunca viaja por la URL.
+//    - doGet expone solo lecturas públicas (getAll, getModeloDetails).
+//    - Rate-limit global: 10 logins fallidos / 10 min → 429.
+//
+//  SCHEMA: calendar, modelos, comisiones, modelo_comisiones, mesas_directivas
 // ================================================================
 
 const SS_ID = "1xhr7v-FDatIC6_rPimEDtKn01JWqHrfQ4cVmnsbH1qQ";
 
-// ── Auth ────────────────────────────────────────────────────────
-function getAdminPass() {
-  return PropertiesService.getScriptProperties().getProperty("ADMIN_PASS") || "celider08admin";
+// SHA-256 de la contraseña actual ("admincelider08").
+// Para rotar: reemplaza esta constante por el hash de la nueva clave y redeploy.
+const DEFAULT_PASS_HASH = "65d582a8efaf45731ffc09fd6efcdfbcf8c6f4f3c9c803120e9168d57e576494";
+
+const TOKEN_TTL_SECONDS    = 1800;  // 30 min de sesión
+const LOGIN_WINDOW_SECONDS = 600;   // ventana del rate-limit
+const LOGIN_MAX_FAILS      = 10;    // máximo de fallos en la ventana
+
+// ── Auth helpers ────────────────────────────────────────────────
+function sha256Hex(s) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(s), Utilities.Charset.UTF_8);
+  let hex = "";
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
+    hex += (b < 16 ? "0" : "") + b.toString(16);
+  }
+  return hex;
+}
+
+function safeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function getAdminPassHash() {
+  // Prioridad: Script Properties (override en caliente) > constante por defecto.
+  const override = PropertiesService.getScriptProperties().getProperty("ADMIN_PASS_HASH");
+  return override || DEFAULT_PASS_HASH;
+}
+
+// Helper opcional: ejecútalo desde el editor para rotar la clave SIN tocar código.
+// Ej.: setAdminPassword("nuevaClaveLarga"); → guarda el hash en Script Properties.
+// Borra la llamada después de ejecutarla.
+function setAdminPassword(plain) {
+  if (!plain || String(plain).length < 8) throw new Error("La contraseña debe tener al menos 8 caracteres.");
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty("ADMIN_PASS_HASH", sha256Hex(plain));
+  props.deleteProperty("ADMIN_PASS"); // limpia restos de la versión vieja en plano
+  return "OK — ADMIN_PASS_HASH actualizado.";
+}
+
+function issueToken() {
+  const token = Utilities.getUuid() + Utilities.getUuid().replace(/-/g, "");
+  CacheService.getScriptCache().put("tok:" + token, "1", TOKEN_TTL_SECONDS);
+  return token;
+}
+
+function tokenValid(token) {
+  if (!token || typeof token !== "string" || token.length < 32) return false;
+  return CacheService.getScriptCache().get("tok:" + token) === "1";
+}
+
+function revokeToken(token) {
+  if (token) CacheService.getScriptCache().remove("tok:" + token);
+}
+
+function rateLimitCheckLogin() {
+  const cache = CacheService.getScriptCache();
+  const raw   = cache.get("login_fails");
+  const fails = raw ? parseInt(raw, 10) : 0;
+  return fails < LOGIN_MAX_FAILS;
+}
+
+function rateLimitRegisterFail() {
+  const cache = CacheService.getScriptCache();
+  const raw   = cache.get("login_fails");
+  const fails = (raw ? parseInt(raw, 10) : 0) + 1;
+  cache.put("login_fails", String(fails), LOGIN_WINDOW_SECONDS);
 }
 
 // ── Response helper ─────────────────────────────────────────────
@@ -36,27 +112,61 @@ function json(data) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// ── GET router ──────────────────────────────────────────────────
+// ── GET router (solo lecturas públicas) ─────────────────────────
 function doGet(e) {
-  const p      = e.parameter;
+  const p      = e.parameter || {};
   const action = p.action || "getAll";
 
   try {
-    // ── Public reads ────────────────────────────────────────────
     if (action === "getAll")           return json(getAllData());
     if (action === "getModeloDetails") return json(getModeloDetails(p.evento_id));
+    return json({ ok: false, error: "Unknown action (GET solo permite lecturas públicas)" });
+  } catch (err) {
+    return json({ ok: false, error: err.message });
+  }
+}
 
-    // ── Admin writes (GET to avoid CORS preflight) ──────────────
-    if (p.password !== getAdminPass())
-      return json({ ok: false, error: "Unauthorized" });
+// ── POST router (login + acciones admin con token) ──────────────
+function doPost(e) {
+  let body = {};
+  try {
+    body = (e && e.postData && e.postData.contents) ? JSON.parse(e.postData.contents) : {};
+  } catch (err) {
+    return json({ ok: false, error: "JSON inválido" });
+  }
 
-    const data = p.data ? JSON.parse(p.data) : {};
+  const action = body.action;
+
+  try {
+    if (action === "login") {
+      if (!rateLimitCheckLogin())
+        return json({ ok: false, error: "Demasiados intentos. Intenta de nuevo en unos minutos.", code: 429 });
+
+      const submitted = sha256Hex(body.password || "");
+      const stored    = getAdminPassHash();
+      if (!safeEqual(submitted, stored)) {
+        rateLimitRegisterFail();
+        return json({ ok: false, error: "Unauthorized", code: 401 });
+      }
+      return json({ ok: true, token: issueToken(), ttl: TOKEN_TTL_SECONDS });
+    }
+
+    if (action === "logout") {
+      revokeToken(body.token);
+      return json({ ok: true });
+    }
+
+    // A partir de aquí, todo requiere token válido.
+    if (!tokenValid(body.token))
+      return json({ ok: false, error: "Unauthorized", code: 401 });
+
+    const data = body.data || {};
 
     switch (action) {
-      case "addRow":    return json(addRow(p.sheet, data));
-      case "updateRow": return json(updateRow(p.sheet, data));
-      case "deleteRow": return json(deleteRow(p.sheet, p.id));
-      default:          return json({ error: "Unknown action" });
+      case "addRow":    return json(addRow(body.sheet, data));
+      case "updateRow": return json(updateRow(body.sheet, data));
+      case "deleteRow": return json(deleteRow(body.sheet, body.id));
+      default:          return json({ ok: false, error: "Unknown action" });
     }
   } catch (err) {
     return json({ ok: false, error: err.message });

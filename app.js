@@ -3,7 +3,7 @@
 //  Updated: color system, Efemérides/MUNs, mobile accordion
 // ================================================================
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGfYotCId_Ip4D1wXi2wVL-jNWmmlBwSjdnbs80FyLia62xmixbiMyEIBDV1wNuI26gg/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgETxcGRh2bpMK5M6s34k_0w90juFuHeauMYcitwy2v5M0LxueWDOilbkZHbId5h3eSg/exec";
 const YEAR       = 2026;
 const MONTHS     = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DAYS_SHORT = ["D","L","M","M","J","V","S"];
@@ -155,6 +155,15 @@ function processEvents(rawData) {
 async function apiGet(params) {
   const url = `${APPS_SCRIPT_URL}?${new URLSearchParams(params)}`;
   const res = await fetch(url);
+  return res.json();
+}
+
+async function apiPost(body) {
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: { "Content-Type": "text/plain;charset=utf-8" }
+  });
   return res.json();
 }
 
@@ -615,8 +624,27 @@ const adminLoginBtn  = qs("#adminLoginBtn");
 const adminAuthError = qs("#adminAuthError");
 const adminClose     = qs("#adminClose");
 
-let adminPassword      = "";
-let adminAuthenticated = false;
+let adminToken         = sessionStorage.getItem("celider_admin_token") || "";
+let adminAuthenticated = !!adminToken;
+
+function setAdminToken(tok) {
+  adminToken = tok || "";
+  if (adminToken) sessionStorage.setItem("celider_admin_token", adminToken);
+  else sessionStorage.removeItem("celider_admin_token");
+  adminAuthenticated = !!adminToken;
+}
+
+function logoutAdmin() {
+  const t = adminToken;
+  setAdminToken("");
+  if (typeof adminAuth !== "undefined" && adminAuth) {
+    adminAuth.style.display    = "flex";
+    adminContent.style.display = "none";
+    adminPassInput.value       = "";
+    adminAuthError.textContent = "Sesión cerrada. Vuelve a iniciar sesión.";
+  }
+  if (t) { try { apiPost({ action: "logout", token: t }); } catch (e) {} }
+}
 
 function openAdmin() {
   adminOverlay.classList.add("open");
@@ -650,56 +678,49 @@ qs(".admin-tabs").addEventListener("click", e => {
   if (window.lucide) lucide.createIcons();
 });
 
-const ADMIN_PASSWORD = "celider08admin";
+function shakeAdminInput(msg) {
+  adminAuthError.textContent = msg;
+  adminPassInput.value = "";
+  adminPassInput.classList.add("shake");
+  setTimeout(() => adminPassInput.classList.remove("shake"), 600);
+  setTimeout(() => adminPassInput.focus(), 100);
+  adminContent.style.display = "none";
+  adminAuth.style.display    = "flex";
+}
 
 async function adminLogin() {
   const pass = adminPassInput.value.trim();
   if (!pass) { adminAuthError.textContent = "Ingresa la contraseña."; return; }
 
-  if (pass !== ADMIN_PASSWORD) {
-    adminAuthError.textContent = "⛔ Acceso denegado. Contraseña incorrecta.";
-    adminPassInput.value = "";
-    adminPassInput.classList.add("shake");
-    setTimeout(() => adminPassInput.classList.remove("shake"), 600);
-    setTimeout(() => adminPassInput.focus(), 100);
-    adminContent.style.display = "none";
-    adminAuth.style.display    = "flex";
-    return;
-  }
-
-  adminLoginBtn.textContent = "Verificando…";
-  adminLoginBtn.disabled    = true;
-  adminPassInput.disabled   = true;
+  adminLoginBtn.textContent  = "Verificando…";
+  adminLoginBtn.disabled     = true;
+  adminPassInput.disabled    = true;
   adminAuthError.textContent = "";
 
   try {
-    const res = await apiGet({ action: "getAll", password: pass });
+    const res = await apiPost({ action: "login", password: pass });
 
-    if (res.error === "Unauthorized" || res.error === "unauthorized" || res.status === 401) {
-      adminAuthError.textContent = "⛔ Acceso denegado. Contraseña incorrecta.";
-      adminPassInput.value = "";
-      adminPassInput.classList.add("shake");
-      setTimeout(() => adminPassInput.classList.remove("shake"), 600);
-      setTimeout(() => adminPassInput.focus(), 100);
-      adminContent.style.display = "none";
-      adminAuth.style.display    = "flex";
-    } else if (res.error) {
-      adminAuthError.textContent = `Error: ${res.error}`;
-    } else {
-      adminPassword      = pass;
-      adminAuthenticated = true;
-      EVENTS            = processEvents(res.calendar      || []);
-      MODELOS           = res.modelos           || [];
-      COMISIONES        = res.comisiones        || [];
-      MODELO_COMISIONES = res.modeloComisiones  || [];
-      MESAS_DIRECTIVAS  = res.mesasDirectivas   || [];
+    if (res && res.ok && res.token) {
+      setAdminToken(res.token);
+      const data = await apiGet({ action: "getAll" });
+      EVENTS            = processEvents(data.calendar      || []);
+      MODELOS           = data.modelos           || [];
+      COMISIONES        = data.comisiones        || [];
+      MODELO_COMISIONES = data.modeloComisiones  || [];
+      MESAS_DIRECTIVAS  = data.mesasDirectivas   || [];
       adminAuth.style.display    = "none";
       adminContent.style.display = "flex";
       adminContent.style.flexDirection = "column";
-      adminContent.style.flex   = "1";
+      adminContent.style.flex     = "1";
       adminContent.style.overflow = "hidden";
       adminContent.style.minHeight = "0";
       refreshAdminData();
+    } else if (res && res.code === 429) {
+      shakeAdminInput("⏱️ Demasiados intentos. Espera unos minutos.");
+    } else if (res && (res.code === 401 || res.error === "Unauthorized")) {
+      shakeAdminInput("⛔ Acceso denegado. Contraseña incorrecta.");
+    } else {
+      adminAuthError.textContent = `Error: ${(res && res.error) || "respuesta inesperada"}`;
     }
   } catch (e) {
     adminAuthError.textContent = "Error de conexión. Verifica la URL del Apps Script.";
@@ -713,12 +734,27 @@ async function adminLogin() {
 adminLoginBtn.onclick = adminLogin;
 adminPassInput.addEventListener("keydown", e => e.key === "Enter" && adminLogin());
 
+function handleAuthFailure(res) {
+  if (res && (res.code === 401 || res.error === "Unauthorized")) {
+    logoutAdmin();
+    return true;
+  }
+  return false;
+}
+
 async function adminSave(sheet, data) {
   const isNew = !data.id;
-  return apiGet({ action: isNew ? "addRow" : "updateRow", sheet, data: JSON.stringify(data), password: adminPassword });
+  const res = await apiPost({
+    action: isNew ? "addRow" : "updateRow",
+    sheet, data, token: adminToken
+  });
+  if (handleAuthFailure(res)) throw new Error("Sesión expirada");
+  return res;
 }
 async function adminDelete(sheet, id) {
-  return apiGet({ action: "deleteRow", sheet, id, password: adminPassword });
+  const res = await apiPost({ action: "deleteRow", sheet, id, token: adminToken });
+  if (handleAuthFailure(res)) throw new Error("Sesión expirada");
+  return res;
 }
 async function reloadData() {
   const data = await apiGet({ action: "getAll" });
